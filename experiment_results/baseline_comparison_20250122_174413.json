@@ -1,0 +1,30 @@
+[
+    {
+        "baseline": "fedavg",
+        "execution_time": 0.3023035526275635,
+        "output": "",
+        "error": "Traceback (most recent call last):\n  File \"C:\\Users\\serap\\Desktop\\dev\\FedSikD_baselines\\main.py\", line 4, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n",
+        "return_code": 1
+    },
+    {
+        "baseline": "fedprox",
+        "execution_time": 0.14154553413391113,
+        "output": "",
+        "error": "Traceback (most recent call last):\n  File \"C:\\Users\\serap\\Desktop\\dev\\FedSikD_baselines\\main.py\", line 4, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n",
+        "return_code": 1
+    },
+    {
+        "baseline": "scaffold",
+        "execution_time": 0.1457676887512207,
+        "output": "",
+        "error": "Traceback (most recent call last):\n  File \"C:\\Users\\serap\\Desktop\\dev\\FedSikD_baselines\\main.py\", line 4, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n",
+        "return_code": 1
+    },
+    {
+        "baseline": "fednova",
+        "execution_time": 0.14837288856506348,
+        "output": "",
+        "error": "Traceback (most recent call last):\n  File \"C:\\Users\\serap\\Desktop\\dev\\FedSikD_baselines\\main.py\", line 4, in <module>\n    import torch\nModuleNotFoundError: No module named 'torch'\n",
+        "return_code": 1
+    }
+]
