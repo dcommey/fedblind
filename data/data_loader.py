@@ -140,12 +140,12 @@ def download_and_prepare_har():
 
         # Prepare the dataset
         logging.info("Preparing HAR dataset...")
-        features = pd.read_csv(os.path.join(extract_path, 'features.txt'), sep='\s+', header=None, names=['index', 'feature'])
+        features = pd.read_csv(os.path.join(extract_path, 'features.txt'), sep=r'\s+', header=None, names=['index', 'feature'])
         feature_names = [f"feature_{i}" for i in range(len(features))]  # Create unique feature names
 
         def load_dataset(subset):
-            X = pd.read_csv(os.path.join(extract_path, subset, f'X_{subset}.txt'), sep='\s+', header=None, names=feature_names)
-            y = pd.read_csv(os.path.join(extract_path, subset, f'y_{subset}.txt'), sep='\s+', header=None, names=['Activity'])
+            X = pd.read_csv(os.path.join(extract_path, subset, f'X_{subset}.txt'), sep=r'\s+', header=None, names=feature_names)
+            y = pd.read_csv(os.path.join(extract_path, subset, f'y_{subset}.txt'), sep=r'\s+', header=None, names=['Activity'])
             return pd.concat([X, y], axis=1)
 
         train_data = load_dataset('train')
@@ -281,11 +281,25 @@ def get_dataloader(dataset_name, num_clients, unlabeled_ratio=0.3, alpha=0.5, ba
     labeled_subset = get_subset_of_labeled_data(labeled_data, labeled_subset_size, num_classes)
     
     client_idcs = dirichlet_split_noniid(torch.tensor([y for _, y in labeled_data]), alpha, num_clients)
-    client_dataloaders = [DataLoader(Subset(labeled_data, idcs), batch_size=batch_size, shuffle=True) for idcs in client_idcs]
+    client_dataloaders = []
+    for idcs in client_idcs:
+        if len(idcs) == 0:
+            # Create an empty dataset to avoid errors
+            empty_dataset = torch.utils.data.TensorDataset(torch.empty(0), torch.empty(0, dtype=torch.long))
+            loader = DataLoader(empty_dataset, batch_size=batch_size, shuffle=True)
+        else:
+            loader = DataLoader(Subset(labeled_data, idcs), batch_size=batch_size, shuffle=True)
+        client_dataloaders.append(loader)
+    
+    # Similarly, for labeled_subset_loader, if its indices are empty, return an empty DataLoader
+    if labeled_subset_size == 0:
+        empty_dataset = torch.utils.data.TensorDataset(torch.empty(0), torch.empty(0, dtype=torch.long))
+        labeled_subset_loader = DataLoader(empty_dataset, batch_size=batch_size, shuffle=True)
+    else:
+        labeled_subset_loader = DataLoader(labeled_subset, batch_size=batch_size, shuffle=True)
     
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     unlabeled_loader = DataLoader(unlabeled_data, batch_size=batch_size, shuffle=True)
-    labeled_subset_loader = DataLoader(labeled_subset, batch_size=batch_size, shuffle=True)
     
     return client_dataloaders, test_loader, unlabeled_loader, labeled_subset_loader
 

@@ -13,6 +13,7 @@ class ScaffoldClient(BaseClient):
         self.dataloader = dataloader
         self.control_variate = None
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def get_dataloader(self, batch_size):
         """Return the client's dataloader."""
@@ -20,13 +21,16 @@ class ScaffoldClient(BaseClient):
 
     def train_scaffold_local_model(self, model, server_control_variate, num_epochs, batch_size):
         """Train with SCAFFOLD's control variates."""
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = model.to(device)
+        model = model.to(self.device)
         model.train()
 
         # Initialize client control variate if needed
         if self.control_variate is None:
-            self.control_variate = [torch.zeros_like(param) for param in model.parameters()]
+            self.control_variate = [torch.zeros_like(param).to(self.device) 
+                                  for param in model.parameters()]
+
+        # Move server control variate to the same device
+        server_control_variate = [sc.to(self.device) for sc in server_control_variate]
 
         criterion = nn.CrossEntropyLoss()
         lr = 0.01  # Default learning rate if config not available
@@ -45,20 +49,19 @@ class ScaffoldClient(BaseClient):
         for epoch in range(num_epochs):
             epoch_loss = 0
             for batch_data, batch_labels in dataloader:
-                batch_data, batch_labels = batch_data.to(device), batch_labels.to(device)
+                batch_data = batch_data.to(self.device)
+                batch_labels = batch_labels.to(self.device)
                 
-                # Forward pass
                 outputs = model(batch_data)
                 loss = criterion(outputs, batch_labels)
                 
-                # Backward pass
                 optimizer.zero_grad()
                 loss.backward()
                 
                 # Update with control variate correction
                 for param, c, sc in zip(model.parameters(), self.control_variate, server_control_variate):
                     if param.grad is not None:
-                        param.grad = param.grad - c.to(device) + sc.to(device)
+                        param.grad = param.grad - c + sc  # All tensors should be on the same device now
                 
                 optimizer.step()
                 
@@ -75,7 +78,7 @@ class ScaffoldClient(BaseClient):
         for init_param, param, c, sc in zip(initial_params, model.parameters(), 
                                           self.control_variate, server_control_variate):
             update = (init_param - param) / (steps * lr)
-            new_c = c + update - sc
+            new_c = c + update - sc  # All tensors should be on the same device
             new_control_variate.append(new_c)
 
         self.control_variate = new_control_variate
@@ -98,22 +101,25 @@ class ScaffoldServer(BaseServer):
         self.global_model = config.model_class()
         self.server_control_variate = None
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def initialize_server_control_variate(self):
         """Initialize server control variate if not already initialized."""
         if self.server_control_variate is None:
-            self.server_control_variate = [torch.zeros_like(param) 
+            self.server_control_variate = [torch.zeros_like(param).to(self.device) 
                                          for param in self.global_model.parameters()]
 
     def train_round(self, round_number):
         """Execute one round of federated learning with SCAFFOLD."""
         self.initialize_server_control_variate()
         
+        # Ensure global model is on the correct device
+        self.global_model = self.global_model.to(self.device)
+        
         client_updates = []
         cv_updates = []
         
         for client in self.clients:
-            # Train each client with SCAFFOLD
             local_state_dict, client_cv, loss, accuracy = client.train_scaffold_local_model(
                 model=copy.deepcopy(self.global_model),
                 server_control_variate=self.server_control_variate,
@@ -133,7 +139,7 @@ class ScaffoldServer(BaseServer):
         if cv_updates:
             for i in range(len(self.server_control_variate)):
                 cv_update = torch.stack([cv[i] for cv in cv_updates]).mean(dim=0)
-                self.server_control_variate[i] = cv_update
+                self.server_control_variate[i] = cv_update.to(self.device)
         
         # Evaluate global model
         if self.test_loader is not None:

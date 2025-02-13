@@ -4,6 +4,7 @@ import logging
 from typing import List, Tuple, Optional
 import numpy as np
 import os
+import copy
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from .base_server import BaseServer
@@ -117,9 +118,13 @@ class FederatedLearningFramework:
                 num_quantiles=self.config.num_quantiles
             )
         
-        # Get cluster assignments
-        self.cluster_assignments = clustering.cluster_clients(self.clients)
-        
+        result = clustering.cluster_clients(self.clients)
+        if isinstance(result, tuple):
+            self.cluster_assignments, self.clustering_quality_metrics = result
+        else:
+            self.cluster_assignments = result
+            self.clustering_quality_metrics = {}
+
         # Group clients by cluster
         unique_clusters = set(self.cluster_assignments)
         self.client_clusters = [
@@ -135,31 +140,9 @@ class FederatedLearningFramework:
         for i, cluster in enumerate(self.client_clusters):
             self.logger.info(f"Cluster {i} has {len(cluster)} clients")
 
-    def train(self):
-        """Train the federated learning model."""
-        if not self.server or not self.clients:
-            raise ValueError("Framework not initialized. Call initialize() first.")
-
-        num_rounds = self.config.num_rounds
-        num_clusters = len(set(self.cluster_assignments))
-        
-        self.logger.info(f"\nTraining Summary:")
-        self.logger.info(f"Total clusters: {num_clusters}")
-        self.logger.info(f"Rounds per cluster: {num_rounds}")
-        self.logger.info(f"Total cluster models: {num_clusters}")
-
-        for round in range(num_rounds):
-            self.server.train_round(round)
-            
-            # Evaluate after each round
-            if self.test_loader is not None:
-                metrics = self.server.evaluate_global_model()
-                if metrics:
-                    self.logger.info(f"Round {round} - Global Model Accuracy: {metrics['accuracy']:.4f}")
-
     def get_student_model_results(self):
-        """Get the results from the server."""
-        return self.server.get_results()
+        """Get the final student model results from knowledge distillation if available."""
+        return getattr(self, 'final_student_results', self.server.get_results())
 
     def get_unlabeled_data(self):
         """Retrieve the unlabeled data for final distillation."""
@@ -168,66 +151,94 @@ class FederatedLearningFramework:
             unlabeled_data.append(batch)
         return torch.cat(unlabeled_data, dim=0)
 
-    def train(self) -> None:
+    def train(self, progress_callback=None) -> None:
         """Run the federated learning training process."""
+        if not self.server or not self.clients:
+            raise ValueError("Framework not initialized. Call initialize() first.")
+
         num_clusters = len(set(self.cluster_assignments))
         self.logger.info(f"Starting training with {num_clusters} clusters")
 
+        # Create clusters
+        clusters = {}
         for cluster_id in range(num_clusters):
-            self.logger.info(f"Training cluster {cluster_id + 1}/{num_clusters}")
-            cluster_clients = [client for client, assigned_cluster in enumerate(self.cluster_assignments) if assigned_cluster == cluster_id]
-            self.logger.info(f"Cluster {cluster_id + 1} has {len(cluster_clients)} clients")
+            cluster_clients = [
+                self.clients[i] for i, assigned_cluster in enumerate(self.cluster_assignments) 
+                if assigned_cluster == cluster_id
+            ]
+            clusters[cluster_id] = cluster_clients
+            self.logger.info(f"Cluster {cluster_id} has {len(cluster_clients)} clients")
+        
+        # Train each cluster
+        for cluster_id, cluster_clients in clusters.items():
+            self.logger.info(f"\nTraining cluster {cluster_id + 1}/{num_clusters}")
             
-            cluster_model = self.TeacherModel().to(self.device)
-            cluster_loss_history = []
-            cluster_accuracy_history = []
-
+            # Initialize history tracking for this cluster
+            self.loss_history[cluster_id] = []
+            self.accuracy_history[cluster_id] = []
+            
+            # Set the current cluster's clients in the server
+            self.server.clients = cluster_clients
+            
+            # Initialize a new global model for this cluster
+            self.server.global_model = self.config.model_class().to(self.device)
+            
+            # Train for specified number of rounds
             for round in range(self.config.num_rounds):
-                self.logger.info(f"Starting round {round + 1}/{self.config.num_rounds} for cluster {cluster_id + 1}")
-                
-                # Let the server handle training and aggregation
+                # Train round
                 self.server.train_round(round)
                 
-                # Calculate metrics using the test loader
-                test_data = torch.cat([batch[0] for batch in self.test_loader], dim=0)
-                test_labels = torch.cat([batch[1] for batch in self.test_loader], dim=0)
-                metrics = self.server.evaluate_global_model(test_data, test_labels)
-                
-                cluster_loss_history.append(metrics.get('loss', 0))
-                cluster_accuracy_history.append(metrics.get('accuracy', 0))
-                
-                self.logger.info(f"Round {round + 1} Metrics - Loss: {metrics.get('loss', 0):.4f}, "
-                              f"Accuracy: {metrics.get('accuracy', 0):.4f}")
-                
-                # Check if target accuracy is reached
-                if self.target_accuracy and metrics['accuracy'] >= self.target_accuracy:
-                    self.logger.info(f"Target accuracy {self.target_accuracy} reached in round {round + 1}")
-                    if self.rounds_to_target is None:
-                        self.rounds_to_target = round + 1
-                    break
+                # Evaluate after each round
+                if self.test_loader is not None:
+                    # Prepare test data
+                    test_data = torch.cat([batch[0] for batch in self.test_loader], dim=0)
+                    test_labels = torch.cat([batch[1] for batch in self.test_loader], dim=0)
+                    
+                    metrics = self.server.evaluate_global_model(test_data, test_labels)
+                    if metrics:
+                        # Store metrics
+                        self.loss_history[cluster_id].append(metrics.get('loss', 0))
+                        self.accuracy_history[cluster_id].append(metrics.get('accuracy', 0))
+                        
+                        # Report progress
+                        if progress_callback:
+                            progress_callback(round + 1, metrics)
+                        
+                        # Log progress
+                        self.logger.info(f"Round {round + 1}/{self.config.num_rounds} - "
+                                    f"Cluster {cluster_id + 1}/{num_clusters} - "
+                                    f"Loss: {metrics.get('loss', 0):.4f}, "
+                                    f"Accuracy: {metrics.get('accuracy', 0):.4f}")
+                        
+                        # Check if target accuracy is reached
+                        if self.target_accuracy and metrics['accuracy'] >= self.target_accuracy:
+                            self.logger.info(f"Target accuracy {self.target_accuracy} reached in round {round + 1}")
+                            if self.rounds_to_target is None:
+                                self.rounds_to_target = round + 1
+                            break
 
-            # Store cluster results
-            self.cluster_models.append(cluster_model)
-            self.loss_history[cluster_id] = cluster_loss_history
-            self.accuracy_history[cluster_id] = cluster_accuracy_history
-            self.logger.info(f"Finished training for cluster {cluster_id + 1}/{num_clusters}")
-
+            # Store trained cluster model
+            self.cluster_models.append(copy.deepcopy(self.server.global_model))
+            
         # Final summary
-        print("\nTraining Summary:")
-        print(f"Total clusters: {num_clusters}")
-        print(f"Rounds per cluster: {self.config.num_rounds}")
-        print(f"Total cluster models: {len(self.cluster_models)}")
-        if self.rounds_to_target is not None:
-            pass
+        self.logger.info("\nTraining Summary:")
+        self.logger.info(f"Total clusters: {num_clusters}")
+        self.logger.info(f"Rounds per cluster: {self.config.num_rounds}")
+        self.logger.info(f"Total cluster models: {len(self.cluster_models)}")
+        
+        # Print final accuracies for each cluster
+        for cluster_id in range(num_clusters):
+            final_accuracy = self.accuracy_history[cluster_id][-1] if self.accuracy_history[cluster_id] else 0
+            self.logger.info(f"Cluster {cluster_id + 1} final accuracy: {final_accuracy:.4f}")
 
-        # Skip distillation when not using clustering
-        if self.use_clustering:
+        # Perform knowledge distillation if specified
+        if self.use_clustering and self.config.use_knowledge_distillation:
+            self.logger.info("\nStarting Knowledge Distillation...")
             unlabeled_data = self.get_unlabeled_data()
             final_results = self.final_distillation(unlabeled_data)
-            print("\nFinal Student Model Results:")
-            print(f"Accuracy: {final_results['accuracy']:.4f}")
-            print(f"Loss: {final_results['loss']:.4f}")
-            print(f"F1 Score: {final_results['f1_score']:.4f}")
+            return final_results
+        
+        return None
 
     def final_distillation(self, unlabeled_data):
         student_model = self._initialize_student_model()
@@ -485,7 +496,8 @@ class FederatedLearningFramework:
         return {
             "num_clusters": len(set(self.cluster_assignments)),
             "cluster_sizes": [self.cluster_assignments.count(i) for i in range(len(set(self.cluster_assignments)))],
-            "clustering_algorithm": type(self.clustering).__name__
+            "clustering_algorithm": self.clustering_quality_metrics.get('algorithm', 'Unknown'),
+            "quality_metrics": self.clustering_quality_metrics
         }
 
     def get_privacy_info(self) -> dict:

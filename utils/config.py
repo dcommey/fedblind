@@ -37,12 +37,13 @@ class Config:
         self.num_clusters = 10
         self.cluster_on = 'features'  # Options: 'features', 'labels'
         self.num_quantiles = 5
+        self.clustering = None 
 
         # Distillation configuration
         self.use_knowledge_distillation = True
         self.distillation_alpha = 0.5
         self.distillation_temperature = 2.0
-        self.distillation_epochs = 10
+        self.distillation_epochs = 50
         self.distillation_learning_rate = 0.001
         self.labeled_subset_size = 1000
 
