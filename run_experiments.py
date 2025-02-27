@@ -8,6 +8,8 @@ from utils.config import Config
 from federated.federated_framework import FederatedLearningFramework
 from data.data_loader import get_dataloader
 import argparse
+import random
+from scipy import stats
 
 def make_serializable(obj):
         """
@@ -29,6 +31,7 @@ def make_serializable(obj):
 
 class ExperimentRunner:
     def __init__(self, args):
+        self.set_seeds(42)
         self.setup_logging()
         self.args = args
         self.baselines = ['fedavg', 'fedprox', 'scaffold', 'fednova']
@@ -36,6 +39,16 @@ class ExperimentRunner:
         self.results_dir = self._create_results_dir()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
+    def set_seeds(self, seed):
+        """Set seeds for reproducibility."""
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        random.seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
     def setup_logging(self):
         logging.basicConfig(
             level=logging.INFO,
@@ -334,6 +347,11 @@ class ExperimentRunner:
                 }
             }
             
+            # Add new metrics
+            summary["time_to_accuracy"] = self._calculate_time_to_accuracy(baseline_results, framework_results)
+            summary["communication_efficiency"] = self._calculate_communication_efficiency(baseline_results, framework_results)
+            summary["statistical_significance"] = self._calculate_statistical_significance(baseline_results, framework_results)
+            
             # Save even if some parts are empty
             self.save_results(summary, 'summary', 'experiment_summary')
             return summary
@@ -412,6 +430,131 @@ class ExperimentRunner:
             return {}
             
         return improvements
+
+    def _calculate_time_to_accuracy(self, baseline_results, framework_results):
+        """Calculate rounds needed to reach accuracy thresholds."""
+        thresholds = [0.6, 0.7, 0.8]
+        time_metrics = {}
+        
+        try:
+            for baseline in self.baselines:
+                if baseline not in baseline_results or baseline not in framework_results:
+                    continue
+                    
+                time_metrics[baseline] = {}
+                
+                for alpha_key in baseline_results[baseline]:
+                    if alpha_key not in framework_results[baseline]:
+                        continue
+                    
+                    # Get accuracy histories
+                    base_acc_history = baseline_results[baseline][alpha_key].get('accuracy_history', [])
+                    framework_acc_history = framework_results[baseline][alpha_key].get('accuracy_history', [])
+                    
+                    # Skip if either history is empty
+                    if not base_acc_history or not framework_acc_history:
+                        continue
+                    
+                    time_metrics[baseline][alpha_key] = {"baseline": {}, "framework": {}}
+                    
+                    # Find rounds to reach threshold for baseline
+                    for threshold in thresholds:
+                        # Check if threshold was reached
+                        above_threshold = [i for i, acc in enumerate(base_acc_history) if acc >= threshold]
+                        rounds_to_threshold = above_threshold[0] + 1 if above_threshold else None
+                        time_metrics[baseline][alpha_key]["baseline"][f"rounds_to_{threshold}"] = rounds_to_threshold
+                    
+                    # Find rounds to reach threshold for framework
+                    for threshold in thresholds:
+                        # Check if threshold was reached
+                        above_threshold = [i for i, acc in enumerate(framework_acc_history) if acc >= threshold]
+                        rounds_to_threshold = above_threshold[0] + 1 if above_threshold else None
+                        time_metrics[baseline][alpha_key]["framework"][f"rounds_to_{threshold}"] = rounds_to_threshold
+        except Exception as e:
+            self.logger.error(f"Error in _calculate_time_to_accuracy: {str(e)}")
+            
+        return time_metrics
+
+    def _calculate_communication_efficiency(self, baseline_results, framework_results):
+        """Calculate accuracy per byte transmitted."""
+        comm_metrics = {}
+        
+        try:
+            for baseline in self.baselines:
+                if baseline not in baseline_results or baseline not in framework_results:
+                    continue
+                    
+                comm_metrics[baseline] = {}
+                
+                for alpha_key in baseline_results[baseline]:
+                    if alpha_key not in framework_results[baseline]:
+                        continue
+                    
+                    base_results = baseline_results[baseline][alpha_key]
+                    framework_res = framework_results[baseline][alpha_key]
+                    
+                    # Get final accuracies
+                    base_acc = base_results.get("final_results", {}).get("accuracy", 0)
+                    framework_acc = framework_res.get("final_results", {}).get("accuracy", 0)
+                    
+                    # Get communication costs if available
+                    base_cost = base_results.get("communication_cost", 1)  # Default to 1 to avoid division by zero
+                    framework_cost = framework_res.get("communication_cost", 1) 
+                    
+                    # Calculate efficiency (accuracy per MB)
+                    base_efficiency = base_acc / (base_cost / (1024 * 1024)) if base_cost > 0 else 0
+                    framework_efficiency = framework_acc / (framework_cost / (1024 * 1024)) if framework_cost > 0 else 0
+                    
+                    comm_metrics[baseline][alpha_key] = {
+                        "baseline_efficiency": base_efficiency,
+                        "framework_efficiency": framework_efficiency,
+                        "efficiency_improvement": framework_efficiency - base_efficiency
+                    }
+        except Exception as e:
+            self.logger.error(f"Error in _calculate_communication_efficiency: {str(e)}")
+            
+        return comm_metrics
+
+    def _calculate_statistical_significance(self, baseline_results, framework_results):
+        """Calculate statistical significance between baseline and framework results."""
+        significance_results = {}
+        
+        try:
+            for baseline in self.baselines:
+                if baseline not in baseline_results or baseline not in framework_results:
+                    continue
+                    
+                significance_results[baseline] = {}
+                
+                for alpha_key in baseline_results[baseline]:
+                    if alpha_key not in framework_results[baseline]:
+                        continue
+                    
+                    # Get accuracy histories
+                    base_acc_history = baseline_results[baseline][alpha_key].get('accuracy_history', [])
+                    framework_acc_history = framework_results[baseline][alpha_key].get('accuracy_history', [])
+                    
+                    # Skip if either history is empty
+                    if not base_acc_history or not framework_acc_history:
+                        continue
+                    
+                    # Match the lengths if different
+                    min_len = min(len(base_acc_history), len(framework_acc_history))
+                    base_acc = base_acc_history[:min_len]
+                    framework_acc = framework_acc_history[:min_len]
+                    
+                    # Calculate t-test
+                    t_stat, p_value = stats.ttest_ind(framework_acc, base_acc, equal_var=False)
+                    
+                    significance_results[baseline][alpha_key] = {
+                        "t_statistic": float(t_stat),
+                        "p_value": float(p_value),
+                        "statistically_significant": bool(p_value < 0.05)
+                    }
+        except Exception as e:
+            self.logger.error(f"Error in _calculate_statistical_significance: {str(e)}")
+            
+        return significance_results
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Federated Learning Experiments")

@@ -28,11 +28,18 @@ class FederatedLearningFramework:
         self.labeled_subset_loader = None
         self.algorithm = config.algorithm
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.clustering = config.clustering
-        self.use_clustering = config.use_clustering
-        self.TeacherModel = config.TeacherModel
-        if not config.model_class:
+        self.clustering = getattr(config, 'clustering', None)  # Use getattr with a default value
+        self.use_clustering = getattr(config, 'use_clustering', False)
+        self.TeacherModel = getattr(config, 'TeacherModel', None)
+        
+        if not getattr(config, 'model_class', None):
             config.model_class = self.TeacherModel  # Fallback if not set
+            
+        # Add accuracy threshold tracking
+        self.accuracy_thresholds = getattr(config, 'accuracy_thresholds', [0.6, 0.7, 0.8])
+        self.threshold_rounds = {threshold: None for threshold in self.accuracy_thresholds}
+        self.communication_cost = 0
+        
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.cluster_assignments = None
         self.cluster_models = []
@@ -205,6 +212,20 @@ class FederatedLearningFramework:
                             progress_callback(round + 1, metrics)
                         
                         # Log progress
+                    test_data = torch.cat([batch[0] for batch in self.test_loader], dim=0)
+                    test_labels = torch.cat([batch[1] for batch in self.test_loader], dim=0)
+                    
+                    metrics = self.server.evaluate_global_model(test_data, test_labels)
+                    if metrics:
+                        # Store metrics
+                        self.loss_history[cluster_id].append(metrics.get('loss', 0))
+                        self.accuracy_history[cluster_id].append(metrics.get('accuracy', 0))
+                        
+                        # Report progress
+                        if progress_callback:
+                            progress_callback(round + 1, metrics)
+                        
+                        # Log progress
                         self.logger.info(f"Round {round + 1}/{self.config.num_rounds} - "
                                     f"Cluster {cluster_id + 1}/{num_clusters} - "
                                     f"Loss: {metrics.get('loss', 0):.4f}, "
@@ -216,6 +237,12 @@ class FederatedLearningFramework:
                             if self.rounds_to_target is None:
                                 self.rounds_to_target = round + 1
                             break
+
+                        # Check for accuracy thresholds
+                        for threshold in self.accuracy_thresholds:
+                            if metrics['accuracy'] >= threshold and self.threshold_rounds[threshold] is None:
+                                self.threshold_rounds[threshold] = round + 1
+                                self.logger.info(f"Reached {threshold} accuracy in round {round + 1}")
 
             # Store trained cluster model
             self.cluster_models.append(copy.deepcopy(self.server.global_model))
@@ -414,14 +441,26 @@ class FederatedLearningFramework:
                 print(f"True: {labels[i].item()}, Predicted: {predicted[i].item()}")
 
     def _distillation_loss(self, student_logits, teacher_logits_or_labels):
+        """Improved distillation loss with balanced soft/hard components."""
         if teacher_logits_or_labels.dim() == 1:  # It's hard labels
             return F.cross_entropy(student_logits, teacher_logits_or_labels)
-        else:  # It's soft labels
-            T = self.config.distillation_temperature
+        else:  # It's soft labels (treated as scaled logits)
+            # Balance between soft and hard losses
+            alpha = 0.5  # Adjust this based on validation performance
+            T = self.temperature
+            
+            # Soft loss with temperature scaling
             soft_targets = F.softmax(teacher_logits_or_labels / T, dim=1)
             student_log_softmax = F.log_softmax(student_logits / T, dim=1)
-            kl_div = F.kl_div(student_log_softmax, soft_targets, reduction='batchmean')
-            return kl_div * (T * T)
+            soft_loss = F.kl_div(student_log_softmax, soft_targets, reduction='batchmean')
+            soft_loss = soft_loss * (T * T)  # Important scaling factor
+            
+            # Hard loss (standard cross entropy with hard targets)
+            hard_targets = torch.argmax(teacher_logits_or_labels, dim=1)
+            hard_loss = F.cross_entropy(student_logits, hard_targets)
+            
+            # Combined loss
+            return alpha * soft_loss + (1-alpha) * hard_loss
 
     def get_loss_history(self) -> dict:
         """Get the loss history for all clusters."""
@@ -484,6 +523,7 @@ class FederatedLearningFramework:
 
     def update_config(self, **kwargs) -> None:
         """Update the configuration of the framework."""
+
         for key, value in kwargs.items():
             if hasattr(self.config, key):
                 setattr(self.config, key, value)
@@ -491,6 +531,29 @@ class FederatedLearningFramework:
                 self.logger.warning(f"Config has no attribute '{key}', skipping.")
         self.logger.info("Updated framework configuration.")
 
+    def get_clustering_info(self) -> dict:
+        """Get information about the clustering process."""
+        return {
+            "num_clusters": len(set(self.cluster_assignments)),
+            "cluster_sizes": [self.cluster_assignments.count(i) for i in range(len(set(self.cluster_assignments)))],
+            "clustering_algorithm": self.clustering_quality_metrics.get('algorithm', 'Unknown'),
+            "quality_metrics": self.clustering_quality_metrics
+        }
+
+    def get_privacy_info(self) -> dict:
+        """Get information about the privacy settings and usage."""
+        return {"use_dp": False}
+
+    # Add method for tracking parameter size
+    def calculate_model_size(self, model):
+        """Calculate the size of a model in bytes"""
+        size = 0
+        for param in model.parameters():
+            size += param.numel() * param.element_size()
+    def get_privacy_info(self) -> dict:
+        return size
+
+# End of federated_framework.py
     def get_clustering_info(self) -> dict:
         """Get information about the clustering process."""
         return {

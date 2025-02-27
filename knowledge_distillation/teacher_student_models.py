@@ -103,17 +103,26 @@ class CIFAR10Teacher(nn.Module):
 class CIFAR10Student(nn.Module):
     def __init__(self):
         super(CIFAR10Student, self).__init__()
-        self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
-        self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
+        # Upgrade the student model architecture to better match the teacher's capacity
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(128)
+        self.conv3 = nn.Conv2d(128, 128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(128)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(32 * 8 * 8, 256)
-        self.fc2 = nn.Linear(256, 10)
-
+        self.dropout = nn.Dropout(0.3)
+        self.fc1 = nn.Linear(128 * 4 * 4, 512)
+        self.bn4 = nn.BatchNorm1d(512)
+        self.fc2 = nn.Linear(512, 10)
+        
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 32 * 8 * 8)
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn3(self.conv3(x))))
+        x = self.pool(x)
+        x = x.view(-1, 128 * 4 * 4)
+        x = self.dropout(F.relu(self.bn4(self.fc1(x))))
         x = self.fc2(x)
         return x
 
