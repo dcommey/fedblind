@@ -7,7 +7,7 @@ import torch
 import logging
 import os
 import argparse
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import torch.nn.functional as F
 from utils.config import Config
 from knowledge_distillation.teacher_student_models import (
@@ -118,24 +118,24 @@ def get_teacher_predictions(teachers, unlabeled_data, temperature=2.0):
         teacher.to(device)
         teacher.eval()
         with torch.no_grad():
-            # Get logits
+            # Get logits directly (don't apply temperature yet)
             logits = teacher(unlabeled_data)
-            # Apply temperature scaling before softmax
-            scaled_logits = logits / temperature
-            # Convert to probabilities
-            probs = F.softmax(scaled_logits, dim=1)
-            all_predictions.append(probs)
+            # Store raw logits for later temperature scaling
+            all_predictions.append(logits)
     
-    # Average the predictions from all teachers
-    avg_probs = torch.mean(torch.stack(all_predictions), dim=0)
-    return avg_probs
+    # Average the logits from all teachers (ensemble)
+    avg_logits = torch.mean(torch.stack(all_predictions), dim=0)
+    
+    # Return raw logits (not softmax probabilities)
+    # We'll apply temperature in the loss function
+    return avg_logits
 
 def train_student_model(student, train_loader, val_loader, temperature=2.0, num_epochs=20):
     """Train student model using knowledge distillation."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     student.to(device)
     
-    optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(student.parameters(), lr=0.001, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=3, verbose=True
     )
@@ -149,24 +149,40 @@ def train_student_model(student, train_loader, val_loader, temperature=2.0, num_
         # Training
         student.train()
         train_loss = 0
+        
         for inputs, targets in train_loader:
             inputs, targets = inputs.to(device), targets.to(device)
             
             optimizer.zero_grad()
-            outputs = student(inputs)
+            student_logits = student(inputs)
             
-            # For soft targets (logits)
+            # For distillation data (soft targets)
             if targets.dim() == 2:
-                # KL divergence loss
+                # Temperature scaling for soft targets
                 T = temperature
-                soft_targets = F.softmax(targets / T, dim=1)
-                log_softmax_outputs = F.log_softmax(outputs / T, dim=1)
-                loss = F.kl_div(log_softmax_outputs, soft_targets, reduction='batchmean') * (T * T)
-            else:
-                # Hard targets (regular cross-entropy)
-                loss = F.cross_entropy(outputs, targets)
+                # Convert teacher logits to probabilities with temperature
+                teacher_probs = F.softmax(targets / T, dim=1)
+                # Get student probabilities with temperature
+                student_log_probs = F.log_softmax(student_logits / T, dim=1)
+                # KL divergence loss
+                loss = F.kl_div(student_log_probs, teacher_probs, reduction='batchmean') * (T * T)
                 
+                # Add hard label guidance using argmax of teacher logits
+                hard_targets = torch.argmax(targets, dim=1)
+                hard_loss = F.cross_entropy(student_logits, hard_targets)
+                
+                # Combined loss with weighted balance (favor soft targets)
+                alpha = 0.7  # Higher weight for soft targets
+                loss = alpha * loss + (1 - alpha) * hard_loss
+            else:
+                # For validation data (hard labels)
+                loss = F.cross_entropy(student_logits, targets)
+            
             loss.backward()
+            
+            # Gradient clipping to stabilize training
+            torch.nn.utils.clip_grad_norm_(student.parameters(), 1.0)
+            
             optimizer.step()
             train_loss += loss.item()
         
@@ -183,6 +199,8 @@ def train_student_model(student, train_loader, val_loader, temperature=2.0, num_
             for inputs, targets in val_loader:
                 inputs, targets = inputs.to(device), targets.to(device)
                 outputs = student(inputs)
+                
+                # For validation, we always use cross entropy with hard labels
                 loss = F.cross_entropy(outputs, targets)
                 val_loss += loss.item()
                 
@@ -204,10 +222,10 @@ def train_student_model(student, train_loader, val_loader, temperature=2.0, num_
         # Save best model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(student.state_dict(), 'best_student.pth')
+            torch.save(student.state_dict(), 'best_student.pth', _use_new_zipfile_serialization=True)
     
     # Load best model
-    student.load_state_dict(torch.load('best_student.pth'))
+    student.load_state_dict(torch.load('best_student.pth', weights_only=True))
     
     return student, train_losses, val_losses, val_accuracies
 
@@ -308,23 +326,35 @@ def main():
     logger.info("Generating soft targets from teachers")
     soft_targets = get_teacher_predictions(teachers, unlabeled_data, temperature=args.temperature)
     
-    # Create datasets for student training
-    train_data = unlabeled_data
-    train_targets = soft_targets
+    # Create training dataset with teacher logits
+    distill_dataset = TensorDataset(unlabeled_data, soft_targets)
     
-    from torch.utils.data import TensorDataset, DataLoader, random_split
+    # Get some labeled data for mixed training
+    labeled_samples = []
+    labeled_targets = []
+    for batch in labeled_subset_loader:
+        inputs, targets = batch
+        labeled_samples.append(inputs)
+        labeled_targets.append(targets)
     
-    # Create training and validation datasets
-    full_dataset = TensorDataset(train_data, train_targets)
-    train_size = int(0.8 * len(full_dataset))
-    val_size = len(full_dataset) - train_size
-    train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+    labeled_data = torch.cat(labeled_samples, dim=0)
+    labeled_targets = torch.cat(labeled_targets, dim=0)
     
-    train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=config.batch_size, shuffle=False)
+    # Important: Convert hard targets to one-hot encoding to match soft targets format
+    num_classes = soft_targets.size(1)  # Get number of classes from soft targets
+    one_hot_targets = F.one_hot(labeled_targets, num_classes=num_classes).float()
+    
+    # Create a labeled dataset for direct supervision with compatible format
+    labeled_dataset = TensorDataset(labeled_data, one_hot_targets)
+    
+    # Combine distillation and direct supervision datasets
+    combined_dataset = torch.utils.data.ConcatDataset([distill_dataset, labeled_dataset])
+    
+    # Create training dataloader
+    train_loader = DataLoader(combined_dataset, batch_size=config.batch_size, shuffle=True)
     
     # Train student model
-    logger.info("Training student model")
+    logger.info("Training student model with combined distillation and direct supervision")
     student = create_student_model(args.dataset)
     student, train_losses, val_losses, val_accuracies = train_student_model(
         student, train_loader, test_loader, 
