@@ -65,17 +65,35 @@ class BaseServer:
         correct = 0
         total = 0
         
-        with torch.no_grad():
-            for data, labels in test_loader:
-                data, labels = data.to(device), labels.to(device)
-                outputs = model(data)
-                loss = torch.nn.functional.cross_entropy(outputs, labels)
-                total_loss += loss.item()
-                _, predicted = torch.max(outputs.data, 1)
-                all_preds.extend(predicted.cpu().numpy())
-                all_labels.extend(labels.cpu().numpy())
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+        try:
+            with torch.no_grad():
+                for data, labels in test_loader:
+                    data, labels = data.to(device), labels.to(device)
+                    outputs = model(data)
+                    
+                    # Ensure model output and labels have compatible dimensions
+                    num_classes = outputs.size(1)
+                    if torch.max(labels) >= num_classes:
+                        self.logger.error(f"Label out of bounds: max label is {torch.max(labels).item()}, "
+                                        f"but model only outputs {num_classes} classes")
+                        self.logger.error(f"Labels range: min={torch.min(labels).item()}, max={torch.max(labels).item()}")
+                        self.logger.error(f"Output shape: {outputs.shape}, Labels shape: {labels.shape}")
+                        raise ValueError(f"Labels must be in range [0, {num_classes-1}]")
+                    
+                    loss = torch.nn.functional.cross_entropy(outputs, labels)
+                    total_loss += loss.item()
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+                    
+                    all_preds.extend(predicted.cpu().numpy())
+                    all_labels.extend(labels.cpu().numpy())
+        except Exception as e:
+            self.logger.error(f"Error during model evaluation: {str(e)}")
+            if "out of bounds" in str(e):
+                raise ValueError(f"Label out of bounds error. Make sure label indices start from 0 and "
+                               f"don't exceed the model's output classes.")
+            raise
         
         accuracy = accuracy_score(all_labels, all_preds)
         f1 = f1_score(all_labels, all_preds, average='weighted', zero_division=1)

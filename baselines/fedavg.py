@@ -107,13 +107,18 @@ class FedAvgServer(BaseServer):
         self.global_model.load_state_dict(agg_state_dict)
         return self.global_model
 
-    def evaluate_global_model(self, test_data, test_labels):
-        """Evaluate the global model on test data."""
-        metrics = self.evaluate_model(self.global_model, test_data, test_labels)
-        self.logger.info(f"Global Model Evaluation - "
-                      f"Accuracy: {metrics['accuracy']:.4f}, "
-                      f"F1 Score: {metrics['f1_score']:.4f}")
-        return metrics
+    def evaluate_global_model(self, test_data=None, test_labels=None):
+        """Evaluate the global model on test data.
+        
+        If test_data and test_labels are not provided, uses the server's test_loader instead.
+        """
+        if test_data is None and self.test_loader is not None:
+            return self.evaluate_model(self.global_model, self.test_loader)
+        elif test_data is not None:
+            return self.evaluate_model(self.global_model, test_data, test_labels)
+        else:
+            self.logger.warning("No test data available for evaluation")
+            return None
 
     def get_results(self):
         """Return the training results."""

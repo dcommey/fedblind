@@ -87,6 +87,21 @@ class ScaffoldClient(BaseClient):
 
         return model.state_dict(), self.control_variate, avg_loss, accuracy
 
+    def train_local_model(self, model, num_epochs, batch_size, learning_rate=0.01):
+        """Override BaseClient's train_local_model to use SCAFFOLD-specific training."""
+        # Initialize control variates if needed
+        if self.control_variate is None:
+            self.control_variate = [torch.zeros_like(param) for param in model.parameters()]
+        
+        # Get server's control variate from model's server_control attribute
+        server_control_variate = getattr(model, 'server_control', None)
+        if server_control_variate is None:
+            # Initialize with zeros if not set
+            server_control_variate = [torch.zeros_like(param) for param in model.parameters()]
+            
+        # Call SCAFFOLD-specific training method
+        return self.train_scaffold_local_model(model, server_control_variate, num_epochs, batch_size)
+
     def get_control_variate(self):
         """Retrieve the client-side control variate."""
         return self.control_variate
@@ -143,8 +158,18 @@ class ScaffoldServer(BaseServer):
         
         # Evaluate global model
         if self.test_loader is not None:
-            metrics = self.evaluate_model(self.global_model, self.test_loader)
+            metrics = self.evaluate_global_model()
             self.logger.info(f"Round {round_number} - Global Model Accuracy: {metrics['accuracy']:.4f}")
+
+    def evaluate_global_model(self, test_data=None, test_labels=None):
+        """Evaluate the global model on test data."""
+        if test_data is None and self.test_loader is not None:
+            return self.evaluate_model(self.global_model, self.test_loader)
+        elif test_data is not None:
+            return self.evaluate_model(self.global_model, test_data, test_labels)
+        else:
+            self.logger.warning("No test data available for evaluation")
+            return None
 
     def get_results(self):
         """Return the training results."""

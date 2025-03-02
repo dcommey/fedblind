@@ -18,48 +18,52 @@ for dir in [DATA_DIR, MNIST_DIR, CIFAR10_DIR, CIFAR100_DIR, SVHN_DIR, HAR_DIR]:
 
 class Config:
     def __init__(self):
-        """Initialize configuration with default values."""
-        # Basic parameters
-        self.algorithm = 'fedavg'  # one of ['fedavg', 'fedprox', 'scaffold', 'fednova']
-        self.dataset_name = 'mnist'
-        self.num_clients = 10
-        self.num_rounds = 50
-        self.batch_size = 32
-        self.learning_rate = 0.01
-        self.local_epochs = 5
-        self.alpha = 0.5  # Dirichlet distribution parameter for non-iid data
-        self.num_epochs = 1  # Number of local epochs
-        
-        # Clustering parameters
-        self.use_clustering = False
-        self.clustering = None 
-        self.num_clusters = 2
-        self.use_dp_clustering = False
-        self.cl_epsilon = 1.0
-        self.num_quantiles = 5
-        self.cluster_on = 'features'  # one of ['features', 'labels']
-        
-        # Knowledge distillation parameters
-        self.use_knowledge_distillation = False
-        self.distillation_temperature = 2.0
-        self.distillation_alpha = 0.5  # Weight for soft targets
-        self.distillation_learning_rate = 0.001
-        self.distillation_epochs = 50
-        
-        # Unlabeled data parameters
+        # Dataset configuration
+        self.dataset_name = 'cifar10'  # Options: 'mnist', 'cifar10', 'cifar100', 'svhn', 'har'
+        self.num_clients = 100
+        self.alpha = 0.5  # Dirichlet distribution parameter
         self.unlabeled_ratio = 0.3
+        self.use_augmentation = False
+
+        # Federated learning configuration
+        self.num_rounds = 100
+        self.local_epochs = 5
+        self.batch_size = 32
+        self.learning_rate = 0.001
+        self.target_accuracy = None
+
+        # Clustering configuration
+        self.use_clustering = False
+        self.num_clusters = 10
+        self.cluster_on = 'features'  # Options: 'features', 'labels'
+        self.num_quantiles = 5
+
+        # Distillation configuration
+        self.use_knowledge_distillation = True
+        self.distillation_alpha = 0.5
+        self.distillation_temperature = 2.0
+        self.distillation_epochs = 10
+        self.distillation_learning_rate = 0.001
         self.labeled_subset_size = 1000
-        
-        # Tracking parameters
-        self.target_accuracy = 0.8
-        self.accuracy_thresholds = [0.6, 0.7, 0.8]
-        
-        # FedProx specific
-        self.proximal_mu = 0.01
-        
-        # Model
-        self.model_class = None
-        self.TeacherModel = None
+
+        # Differential privacy configuration
+        self.use_differential_privacy = False  # Set to False by default
+        self.use_dp_model_training = False
+        self.use_dp_clustering = False
+        self.epsilon_1 = 0.1  # For clustering
+        self.epsilon_2 = 0.5  # For model training
+        self.delta = 1e-5
+        self.dp_l2_norm_clip = 1.0
+        self.dp_noise_multiplier = 1.1
+        self.dp_num_microbatches = 1
+
+        # Algorithm-specific parameters
+        self.algorithm = 'fedavg'  # Default algorithm
+        self.proximal_mu = 0.01    # FedProx hyperparameter
+
+        # Model related
+        self.model_class = None    # Will be set based on dataset
+        self.TeacherModel = None   # Will be set based on dataset
 
     def update(self, **kwargs):
         """Update config parameters."""

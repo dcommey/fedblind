@@ -3,6 +3,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import logging
 
 class MNISTTeacher(nn.Module):
     def __init__(self):
@@ -67,18 +68,49 @@ class HARTeacher(nn.Module):
         return x
 
 class HARStudent(nn.Module):
-    def __init__(self, input_size, num_classes):
+    def __init__(self, input_size=561, num_classes=6):
+        """
+        Student model for Human Activity Recognition dataset
+        """
         super(HARStudent, self).__init__()
-        self.conv1 = nn.Conv1d(input_size, 32, kernel_size=5)
-        self.fc1 = nn.Linear(32 * 124, 64)
-        self.fc2 = nn.Linear(64, num_classes)
-
+        self.input_size = input_size
+        # Simpler architecture than teacher
+        self.fc1 = nn.Linear(input_size, 100)
+        self.relu1 = nn.ReLU()
+        self.dropout = nn.Dropout(0.2)
+        self.fc2 = nn.Linear(100, 50) 
+        self.relu2 = nn.ReLU()
+        self.fc3 = nn.Linear(50, num_classes)
+        self.logger = logging.getLogger(self.__class__.__name__)
+        
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.max_pool1d(x, 2)
-        x = x.view(-1, 32 * 124)
-        x = F.relu(self.fc1(x))
+        # Reshape handling for different input types
+        if len(x.shape) == 1:
+            x = x.unsqueeze(0)  # Add batch dimension if missing
+        
+        # Convert any n-dimensional input to 2D [batch_size, features]
+        if len(x.shape) > 2:
+            batch_size = x.size(0)
+            x = x.reshape(batch_size, -1)
+        
+        # Handle dimension mismatches
+        if x.shape[1] != self.input_size:
+            batch_size = x.shape[0]
+            if x.shape[1] > self.input_size:
+                # Log and truncate
+                x = x[:, :self.input_size]
+            else:
+                # Log and pad
+                padding = torch.zeros(batch_size, self.input_size - x.shape[1], device=x.device)
+                x = torch.cat([x, padding], dim=1)
+        
+        # Forward pass
+        x = self.fc1(x)
+        x = self.relu1(x)
+        x = self.dropout(x)
         x = self.fc2(x)
+        x = self.relu2(x)
+        x = self.fc3(x)
         return x
 
 class CIFAR10Teacher(nn.Module):

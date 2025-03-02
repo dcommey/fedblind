@@ -29,19 +29,50 @@ class UnlabeledDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         img = self.data[idx]
         
-        # Convert to PIL Image if it's a numpy array
+        # Convert to PyTorch tensor directly if it's tabular data (like HAR)
+        if len(img.shape) == 1:
+            # Use clone().detach() instead of torch.tensor() to avoid warning
+            if isinstance(img, torch.Tensor):
+                return img.clone().detach().float()
+            else:
+                return torch.tensor(img, dtype=torch.float32)
+        
+        # Handle SVHN and other image datasets differently
         if isinstance(img, np.ndarray):
-            img = Image.fromarray(img)
+            # For SVHN which has weird shapes
+            if img.shape == (1, 1, 32) or len(img.shape) > 2:
+                # Reshape to a format PIL can handle
+                if img.shape[0] == 1:  # Handle single-channel case
+                    img = img.reshape(img.shape[1:])
+                
+                # If it's RGB but in a weird order, transpose it
+                if len(img.shape) == 3 and img.shape[0] == 3:
+                    img = np.transpose(img, (1, 2, 0))
+                
+                # Ensure uint8 format for PIL
+                if img.dtype != np.uint8:
+                    img = (img * 255).astype(np.uint8)
+            
+            # Convert to PIL Image if it's a 2D or 3D array (image)
+            if len(img.shape) >= 2:
+                try:
+                    img = Image.fromarray(img)
+                except TypeError:
+                    # If conversion fails, use tensor directly
+                    img = torch.tensor(img, dtype=torch.float32)
+                    if self.transform:
+                        img = self.transform(img)
+                    return img
 
         # Apply transforms if any
-        if self.transform:
+        if self.transform and isinstance(img, Image.Image):
             img = self.transform(img)
         
         # Ensure the image is a float tensor
         if not isinstance(img, torch.Tensor):
             img = transforms.ToTensor()(img)
         
-        # If it's already a tensor, make sure it's float
+        # Make sure tensor is float
         img = img.float()
         
         # Normalize if not done by transform
@@ -107,6 +138,14 @@ def load_har():
         X_test = test_data.drop('Activity_561', axis=1).values
         y_test = test_data['Activity_561'].values
         
+        # Convert labels to be zero-indexed (HAR labels are 1-6, we need 0-5)
+        y_train = y_train - 1
+        y_test = y_test - 1
+        
+        # Ensure there are no out-of-bounds values
+        assert np.all(y_train >= 0) and np.all(y_train < 6), "Train labels should be 0-5"
+        assert np.all(y_test >= 0) and np.all(y_test < 6), "Test labels should be 0-5"
+        
         # Normalize the data
         scaler = StandardScaler()
         X_train_normalized = scaler.fit_transform(X_train)
@@ -140,12 +179,12 @@ def download_and_prepare_har():
 
         # Prepare the dataset
         logging.info("Preparing HAR dataset...")
-        features = pd.read_csv(os.path.join(extract_path, 'features.txt'), sep=r'\s+', header=None, names=['index', 'feature'])
+        features = pd.read_csv(os.path.join(extract_path, 'features.txt'), sep='\s+', header=None, names=['index', 'feature'])
         feature_names = [f"feature_{i}" for i in range(len(features))]  # Create unique feature names
 
         def load_dataset(subset):
-            X = pd.read_csv(os.path.join(extract_path, subset, f'X_{subset}.txt'), sep=r'\s+', header=None, names=feature_names)
-            y = pd.read_csv(os.path.join(extract_path, subset, f'y_{subset}.txt'), sep=r'\s+', header=None, names=['Activity'])
+            X = pd.read_csv(os.path.join(extract_path, subset, f'X_{subset}.txt'), sep='\s+', header=None, names=feature_names)
+            y = pd.read_csv(os.path.join(extract_path, subset, f'y_{subset}.txt'), sep='\s+', header=None, names=['Activity'])
             return pd.concat([X, y], axis=1)
 
         train_data = load_dataset('train')
@@ -176,6 +215,7 @@ def download_and_prepare_har():
         raise
 
 def create_unlabeled_subset(dataset, unlabeled_ratio=0.3):
+    """Create labeled and unlabeled subsets from a dataset."""
     num_samples = len(dataset)
     num_unlabeled = int(num_samples * unlabeled_ratio)
     unlabeled_indices = np.random.choice(num_samples, num_unlabeled, replace=False)
@@ -183,24 +223,28 @@ def create_unlabeled_subset(dataset, unlabeled_ratio=0.3):
     
     labeled_data = Subset(dataset, labeled_indices)
     
-    # Check if the dataset has a 'data' attribute (like MNIST, CIFAR)
-    if hasattr(dataset, 'data'):
-        if isinstance(dataset.data, np.ndarray):
-            unlabeled_data = dataset.data[unlabeled_indices]
-        elif isinstance(dataset.data, torch.Tensor):
-            unlabeled_data = dataset.data[unlabeled_indices].numpy()
-        else:
-            # For datasets with PIL Images
-            unlabeled_data = [dataset.data[i] for i in unlabeled_indices]
+    # Handle HAR and other non-image datasets
+    if hasattr(dataset, 'data') and isinstance(dataset.data, np.ndarray):
+        # For HAR or other tabular datasets with a data attribute
+        unlabeled_data = dataset.data[unlabeled_indices]
+    elif hasattr(dataset, 'data') and isinstance(dataset.data, torch.Tensor):
+        # For datasets with tensor data
+        unlabeled_data = dataset.data[unlabeled_indices].numpy()
+    elif hasattr(dataset, 'data'):
+        # For datasets with other data formats
+        try:
+            unlabeled_data = np.array([dataset.data[i] for i in unlabeled_indices])
+        except:
+            # For datasets where direct indexing doesn't work
+            unlabeled_data = [dataset[i][0] for i in unlabeled_indices]
     else:
-        # For datasets without 'data' attribute (like HAR), create a new dataset
+        # For datasets without a 'data' attribute, use dataset[i][0]
         unlabeled_data = [dataset[i][0] for i in unlabeled_indices]
     
-    # Create transform that includes ToTensor and Normalize
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))  # MNIST mean and std
-    ])
+    # Use dataset-specific transforms
+    transform = None
+    if hasattr(dataset, 'transform') and dataset.transform is not None:
+        transform = dataset.transform
     
     unlabeled_dataset = UnlabeledDataset(unlabeled_data, transform=transform)
     
@@ -268,38 +312,65 @@ def get_dataloader(dataset_name, num_clients, unlabeled_ratio=0.3, alpha=0.5, ba
             train_dataset, test_dataset = load_svhn()
         elif dataset_name == 'har':
             train_dataset, test_dataset = load_har()
+            # HAR needs a smaller subset size due to fewer samples
+            labeled_subset_size = min(labeled_subset_size, len(train_dataset) // 2)
         else:
-            raise ValueError("Invalid dataset name")
+            raise ValueError(f"Invalid dataset name: {dataset_name}")
     except Exception as e:
         logging.error(f"Error loading {dataset_name} dataset: {str(e)}")
-        return None, None, None
+        raise
 
     labeled_data, unlabeled_data = create_unlabeled_subset(train_dataset, unlabeled_ratio)
     
-    # Create labeled subset
-    num_classes = len(set(y for _, y in labeled_data))
-    labeled_subset = get_subset_of_labeled_data(labeled_data, labeled_subset_size, num_classes)
-    
-    client_idcs = dirichlet_split_noniid(torch.tensor([y for _, y in labeled_data]), alpha, num_clients)
-    client_dataloaders = []
-    for idcs in client_idcs:
-        if len(idcs) == 0:
-            # Create an empty dataset to avoid errors
-            empty_dataset = torch.utils.data.TensorDataset(torch.empty(0), torch.empty(0, dtype=torch.long))
-            loader = DataLoader(empty_dataset, batch_size=batch_size, shuffle=True)
-        else:
-            loader = DataLoader(Subset(labeled_data, idcs), batch_size=batch_size, shuffle=True)
-        client_dataloaders.append(loader)
-    
-    # Similarly, for labeled_subset_loader, if its indices are empty, return an empty DataLoader
-    if labeled_subset_size == 0:
-        empty_dataset = torch.utils.data.TensorDataset(torch.empty(0), torch.empty(0, dtype=torch.long))
-        labeled_subset_loader = DataLoader(empty_dataset, batch_size=batch_size, shuffle=True)
+    # Determine number of classes for the dataset
+    if dataset_name == 'mnist' or dataset_name == 'cifar10' or dataset_name == 'svhn':
+        num_classes = 10
+    elif dataset_name == 'cifar100':
+        num_classes = 100
+    elif dataset_name == 'har':
+        num_classes = 6
     else:
-        labeled_subset_loader = DataLoader(labeled_subset, batch_size=batch_size, shuffle=True)
+        num_classes = 10  # Default
+    
+    # Create labeled subset with error handling
+    try:
+        labeled_subset = get_subset_of_labeled_data(labeled_data, labeled_subset_size, num_classes)
+        if len(labeled_subset) == 0:
+            logging.warning(f"Empty labeled subset for {dataset_name}, using first sample")
+            labeled_subset = Subset(labeled_data, [0])  # Include at least one sample
+    except Exception as e:
+        logging.error(f"Error creating labeled subset: {str(e)}")
+        labeled_subset = Subset(labeled_data, [0])  # Fallback to single sample
+    
+    # Create client datasets with Dirichlet distribution
+    try:
+        client_idcs = dirichlet_split_noniid(
+            torch.tensor([labeled_data[i][1] for i in range(len(labeled_data))]), 
+            alpha, 
+            num_clients
+        )
+        client_dataloaders = [
+            DataLoader(Subset(labeled_data, idcs), batch_size=batch_size, shuffle=True) 
+            for idcs in client_idcs
+        ]
+    except Exception as e:
+        logging.error(f"Error splitting data among clients: {str(e)}")
+        # Fallback to random splitting
+        indices = list(range(len(labeled_data)))
+        random.shuffle(indices)
+        client_size = len(indices) // num_clients
+        client_dataloaders = [
+            DataLoader(
+                Subset(labeled_data, indices[i*client_size:(i+1)*client_size]),
+                batch_size=batch_size, 
+                shuffle=True
+            ) 
+            for i in range(num_clients)
+        ]
     
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     unlabeled_loader = DataLoader(unlabeled_data, batch_size=batch_size, shuffle=True)
+    labeled_subset_loader = DataLoader(labeled_subset, batch_size=batch_size, shuffle=True)
     
     return client_dataloaders, test_loader, unlabeled_loader, labeled_subset_loader
 
@@ -315,8 +386,31 @@ def get_subset_of_labeled_data(dataset, num_samples, num_classes):
     Returns:
     torch.utils.data.Subset: A subset of the original dataset with balanced classes.
     """
-    samples_per_class = num_samples // num_classes
-    class_counts = [0] * num_classes
+    # Special handling for HAR dataset which may have fewer samples
+    if len(dataset) < num_samples:
+        return dataset  # Return the entire dataset if smaller than requested
+        
+    # Ensure num_samples is at least equal to the number of classes
+    samples_per_class = max(1, num_samples // num_classes)
+    
+    # Get all class labels from the dataset
+    all_labels = []
+    for i in range(min(1000, len(dataset))):  # Sample up to 1000 items to determine classes
+        _, label = dataset[i]
+        all_labels.append(label)
+    
+    # Find actual number of unique classes
+    unique_labels = set(all_labels)
+    actual_num_classes = len(unique_labels)
+    
+    if actual_num_classes == 0:
+        raise ValueError("No classes found in dataset")
+    
+    # Adjust samples per class based on actual classes found
+    samples_per_class = max(1, num_samples // actual_num_classes)
+    
+    # Initialize counters and result indices
+    class_counts = {label: 0 for label in unique_labels}
     subset_indices = []
 
     all_indices = list(range(len(dataset)))
@@ -324,13 +418,22 @@ def get_subset_of_labeled_data(dataset, num_samples, num_classes):
 
     for idx in all_indices:
         _, label = dataset[idx]
-        if class_counts[label] < samples_per_class:
+        # Convert tensor to scalar if needed
+        if isinstance(label, torch.Tensor):
+            label = label.item() if label.numel() == 1 else label[0].item()
+            
+        if label in class_counts and class_counts[label] < samples_per_class:
             subset_indices.append(idx)
             class_counts[label] += 1
         
-        if sum(class_counts) == num_samples:
+        # Stop when we have enough samples or all classes are satisfied
+        if sum(class_counts.values()) >= num_samples or all(count >= samples_per_class for count in class_counts.values()):
             break
 
+    # Ensure we have at least one sample
+    if not subset_indices:
+        subset_indices = [0]  # Include at least one sample to avoid empty dataset
+        
     return Subset(dataset, subset_indices)
 
 # Example usage

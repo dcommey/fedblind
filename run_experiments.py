@@ -10,6 +10,7 @@ from data.data_loader import get_dataloader
 import argparse
 import random
 from scipy import stats
+import time
 
 def make_serializable(obj):
         """
@@ -36,7 +37,7 @@ class ExperimentRunner:
         self.args = args
         self.baselines = ['fedavg', 'fedprox', 'scaffold', 'fednova']
         self.alphas = [0.1, 0.5, 1.0]
-        self.results_dir = self._create_results_dir()
+        self.results_dir = self._get_results_dir()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
     def set_seeds(self, seed):
@@ -60,16 +61,72 @@ class ExperimentRunner:
         )
         self.logger = logging.getLogger(__name__)
 
-    def _create_results_dir(self):
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        results_dir = f"results_{timestamp}"
-        os.makedirs(results_dir, exist_ok=True)
+    def _get_results_dir(self):
+        """Get or create results directory with proper organization."""
+        # Check if results directory exists, otherwise create it
+        base_results_dir = "results"
         
-        # Create subdirectories for different result types
-        for subdir in ['baselines', 'framework', 'summary']:
-            os.makedirs(os.path.join(results_dir, subdir), exist_ok=True)
+        if not os.path.exists(base_results_dir):
+            os.makedirs(base_results_dir, exist_ok=True)
             
-        return results_dir
+        # Create subdirectories for different result types if they don't exist
+        for subdir in ['baselines', 'framework', 'summary']:
+            subdir_path = os.path.join(base_results_dir, subdir)
+            if not os.path.exists(subdir_path):
+                os.makedirs(subdir_path, exist_ok=True)
+        
+        # Add timestamp only to log file, not to the directory structure
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Add run info to log
+        self.logger.info(f"Experiment run started at {timestamp}")
+        self.logger.info(f"Saving results to directory: {base_results_dir}")
+        
+        return base_results_dir
+
+    def _save_experiment_results(self, results, experiment_name):
+        """Save experiment results using consistent directory structure."""
+        # Determine appropriate subdirectory based on experiment name
+        if '_baseline_' in experiment_name:
+            subdir = 'baselines'
+        elif '_framework_' in experiment_name:
+            subdir = 'framework'
+        else:
+            subdir = 'other'
+        
+        # Build the file path
+        filepath = os.path.join(self.results_dir, subdir, f"{experiment_name}.json")
+        
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        # Make results JSON serializable
+        serializable_results = self._make_serializable(results)
+        
+        # Write to file
+        with open(filepath, 'w') as f:
+            json.dump(serializable_results, f, indent=4)
+        
+        self.logger.info(f"Saved results to {filepath}")
+    
+    def _make_serializable(self, obj):
+        """Convert objects to JSON-serializable format."""
+        if isinstance(obj, (str, int, float, bool)) or obj is None:
+            return obj
+        elif isinstance(obj, dict):
+            return {k: self._make_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._make_serializable(item) for item in obj]
+        elif isinstance(obj, tuple):
+            return tuple(self._make_serializable(item) for item in obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, torch.Tensor):
+            return obj.cpu().numpy().tolist()
+        elif isinstance(obj, type):
+            return str(obj)
+        else:
+            return str(obj)
 
     def _get_data_loaders(self, config):
         """Initialize data loaders with current configuration"""
@@ -84,109 +141,143 @@ class ExperimentRunner:
         return client_dataloaders, test_loader, unlabeled_loader, labeled_subset_loader
 
     def save_results(self, results, category, experiment_name):
-        import os, json
-        # Build the full file path using os.path.join for cross-platform compatibility.
+        """Save results to appropriate subdirectory."""
         filepath = os.path.join(self.results_dir, category, f"{experiment_name}.json")
-        # Ensure the directory exists; if not, create it.
+        
+        # Ensure the directory exists
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        # Convert results to a JSON-serializable format.
-        serializable_results = make_serializable(results)
+        
+        # Convert results to a JSON-serializable format
+        serializable_results = self._make_serializable(results)
+        
+        # Write to file
         with open(filepath, 'w') as f:
             json.dump(serializable_results, f, indent=4)
+            
         self.logger.info(f"Saved results to {filepath}")
 
     def run_single_experiment(self, config, experiment_name):
-        """Run a single experiment with proper initialization"""
-        self.logger.info(f"\n{'='*50}")
-        self.logger.info(f"Starting experiment: {experiment_name}")
-        self.logger.info(f"Configuration:")
-        self.logger.info(f"- Algorithm: {config.algorithm}")
-        self.logger.info(f"- Dataset: {config.dataset_name}")
-        self.logger.info(f"- Alpha (non-IID degree): {config.alpha}")
-        self.logger.info(f"- Number of rounds: {config.num_rounds}")
-        if config.use_clustering:
-            self.logger.info(f"- Clustering: {'DP' if self.args.use_dp_clustering else 'Non-DP'}")
-            self.logger.info(f"- Number of clusters: {config.num_clusters}")
-        if config.use_knowledge_distillation:
-            self.logger.info(f"- Using Knowledge Distillation")
-        self.logger.info(f"{'='*50}\n")
-        
-        # Get data loaders
-        client_dataloaders, test_loader, unlabeled_loader, labeled_subset_loader = self._get_data_loaders(config)
-        
-        # Initialize framework
-        framework = FederatedLearningFramework(config)
-        framework.initialize(
-            client_dataloaders=client_dataloaders,
-            test_loader=test_loader, 
-            unlabeled_loader=unlabeled_loader,
-            labeled_subset_loader=labeled_subset_loader
-        )
-        
-        # Train and collect results
-        self.logger.info("Starting training...")
-        current_round = 0
-        
-        def progress_callback(round_num, metrics):
-            nonlocal current_round
-            if round_num > current_round:
-                current_round = round_num
-                accuracy = metrics.get('accuracy', 'N/A')
-                loss = metrics.get('loss', 'N/A')
-                
-                # Format accuracy and loss only if they are numbers
-                accuracy_str = f"{accuracy:.4f}" if isinstance(accuracy, (float, int)) else accuracy
-                loss_str = f"{loss:.4f}" if isinstance(loss, (float, int)) else loss
-                
-                self.logger.info(f"Round {round_num}/{config.num_rounds} - "
-                            f"Accuracy: {accuracy_str}, "
-                            f"Loss: {loss_str}")
-        
-        # Add progress_callback to framework training
-        framework.train(progress_callback=progress_callback)
-        
-        self.logger.info(f"\nExperiment {experiment_name} completed.")
-        if config.use_knowledge_distillation:
-            final_results = framework.get_student_model_results()
-            if final_results:
-                accuracy = final_results.get('accuracy', 'N/A')
-                loss = final_results.get('loss', 'N/A')
-                f1 = final_results.get('f1_score', 'N/A')
-                
-                # Format metrics only if they are numbers
-                accuracy_str = f"{accuracy:.4f}" if isinstance(accuracy, (float, int)) else str(accuracy)
-                loss_str = f"{loss:.4f}" if isinstance(loss, (float, int)) else str(loss)
-                f1_str = f"{f1:.4f}" if isinstance(f1, (float, int)) else str(f1)
-                
-                self.logger.info(f"Final Student Model Results:")
-                self.logger.info(f"- Accuracy: {accuracy_str}")
-                self.logger.info(f"- Loss: {loss_str}")
-                self.logger.info(f"- F1 Score: {f1_str}")
-        else:
-            # For baselines, perform a final evaluation on the global model
-            # Prepare test data as in the training loop
-            test_data = torch.cat([batch[0] for batch in framework.test_loader], dim=0)
-            test_labels = torch.cat([batch[1] for batch in framework.test_loader], dim=0)
-            final_results = framework.server.evaluate_global_model(test_data, test_labels)
-
-        results = {
-            'accuracy_history': framework.get_accuracy_history(),
-            'loss_history': framework.get_loss_history(),
-            'cluster_assignments': framework.get_cluster_assignments() if config.use_clustering else None,
-            'rounds_to_target': framework.rounds_to_target,
-            'final_results': final_results,
-            'config': vars(config)
-        }
-        
-        # Add privacy budget if using DP
-        if config.use_dp_clustering:
-            results['privacy_info'] = framework.get_privacy_info()
+        """Run a single experiment with the given configuration."""
+        try:
+            start_time = time.time()
             
-        # Add clustering info if using clustering
-        if config.use_clustering:
-            results['clustering_info'] = framework.get_clustering_info()
-                
-        return results
+            # Set up clustering if needed
+            if getattr(config, 'use_dp_clustering', False):
+                from clustering.dp_quantile_clustering import DPQuantileClustering
+                config.clustering = DPQuantileClustering(
+                    max_clusters=config.num_clusters,
+                    epsilon=config.cl_epsilon,
+                    num_quantiles=config.num_quantiles,
+                    dataset_name=config.dataset_name,
+                    cluster_on=config.cluster_on
+                )
+                config.use_clustering = True
+            elif getattr(config, 'num_clusters', 1) > 1:
+                from clustering.non_dp_quantile_clustering import NonDPQuantileClustering
+                config.clustering = NonDPQuantileClustering(
+                    max_clusters=config.num_clusters,
+                    num_quantiles=config.num_quantiles,
+                    dataset_name=config.dataset_name,
+                    cluster_on=config.cluster_on
+                )
+                config.use_clustering = True
+            else:
+                config.clustering = None
+                config.use_clustering = False
+            
+            # Initialize the framework
+            framework = FederatedLearningFramework(config)
+            
+            # Load data
+            client_dataloaders, test_loader, unlabeled_loader, labeled_subset_loader = get_dataloader(
+                config.dataset_name, 
+                config.num_clients,
+                config.unlabeled_ratio,
+                config.alpha,
+                config.batch_size,
+                labeled_subset_size=config.labeled_subset_size
+            )
+            
+            # Initialize framework with data
+            framework.initialize(
+                client_dataloaders=client_dataloaders,
+                test_loader=test_loader,
+                unlabeled_loader=unlabeled_loader,
+                labeled_subset_loader=labeled_subset_loader
+            )
+            
+            # Run training and capture results
+            training_results = framework.train()
+            
+            # Ensure we have a dictionary for results
+            if training_results is None:
+                training_results = {}
+            
+            # Add experiment metadata
+            results = {
+                'experiment_name': experiment_name,
+                'runtime': time.time() - start_time,
+                'config': self._get_serializable_config(config),
+                'final_results': {
+                    'accuracy': training_results.get('final_accuracy'),
+                    'loss': training_results.get('final_loss'),
+                    'f1_score': training_results.get('final_f1_score')
+                },
+                'accuracy_history': self._extract_accuracy_history(training_results),
+                'loss_history': self._extract_loss_history(training_results),
+                'clustering_info': {
+                    'num_clusters': training_results.get('num_clusters', 1),
+                    'cluster_sizes': training_results.get('cluster_sizes', [config.num_clients])
+                },
+                'rounds_to_target': training_results.get('rounds_to_target')
+            }
+            
+            # Save results
+            self.save_results(results, 'baseline' if 'framework' not in experiment_name else 'framework', experiment_name)
+            
+            return results
+        
+        except Exception as e:
+            self.logger.error(f"Error during experiment: {str(e)}")
+            import traceback
+            self.logger.error(traceback.format_exc())
+            raise
+
+    def _extract_accuracy_history(self, results):
+        """Extract accuracy history from results in a consistent format."""
+        # Check for distillation results first
+        if 'distillation_results' in results and 'val_accuracy_history' in results['distillation_results']:
+            return results['distillation_results']['val_accuracy_history']
+            
+        # Check for cluster accuracy history
+        if 'accuracy_history' in results:
+            # If it's a dict with cluster IDs as keys, flatten to a single list using last cluster
+            if isinstance(results['accuracy_history'], dict) and results['accuracy_history']:
+                last_cluster = max(results['accuracy_history'].keys())
+                return results['accuracy_history'][last_cluster]
+            # If it's already a list, return it
+            elif isinstance(results['accuracy_history'], list):
+                return results['accuracy_history']
+        
+        return []
+
+    def _extract_loss_history(self, results):
+        """Extract loss history from results in a consistent format."""
+        # Check for distillation results first
+        if 'distillation_results' in results and 'val_loss_history' in results['distillation_results']:
+            return results['distillation_results']['val_loss_history']
+            
+        # Check for cluster loss history
+        if 'loss_history' in results:
+            # If it's a dict with cluster IDs as keys, flatten to a single list using last cluster
+            if isinstance(results['loss_history'], dict) and results['loss_history']:
+                last_cluster = max(results['loss_history'].keys())
+                return results['loss_history'][last_cluster]
+            # If it's already a list, return it
+            elif isinstance(results['loss_history'], list):
+                return results['loss_history']
+        
+        return []
 
     def run_baselines(self):
         """Run baseline experiments."""
@@ -212,7 +303,7 @@ class ExperimentRunner:
             config.use_knowledge_distillation = False
             config.num_clusters = 1  # No clustering for baselines
 
-            # Set model based on dataset
+            # Set model based on dataset with correct input_size for HAR
             if config.dataset_name == 'mnist':
                 from models.mnist_models import MNISTTeacher
                 config.model_class = MNISTTeacher
@@ -231,8 +322,26 @@ class ExperimentRunner:
                 config.TeacherModel = SVHNTeacher
             elif config.dataset_name == 'har':
                 from models.har_models import HARTeacher
-                config.model_class = HARTeacher
-                config.TeacherModel = HARTeacher
+                # Get exact feature count for HAR dataset
+                import numpy as np
+                try:
+                    from utils.config import HAR_DIR
+                    import os
+                    import pandas as pd
+                    har_train_file = os.path.join(HAR_DIR, "har_train.csv")
+                    if os.path.exists(har_train_file):
+                        # Count number of columns (excluding Activity column)
+                        cols = pd.read_csv(har_train_file, nrows=1).shape[1] - 1
+                        self.logger.info(f"Detected {cols} features in HAR dataset")
+                        config.model_class = lambda: HARTeacher(input_size=cols)
+                        config.TeacherModel = lambda: HARTeacher(input_size=cols)
+                    else:
+                        config.model_class = HARTeacher
+                        config.TeacherModel = HARTeacher
+                except Exception as e:
+                    self.logger.error(f"Error determining HAR input size: {str(e)}")
+                    config.model_class = HARTeacher
+                    config.TeacherModel = HARTeacher
 
             # Now run the single experiment
             results = self.run_single_experiment(config, experiment_name)
@@ -241,7 +350,7 @@ class ExperimentRunner:
             # Save the results
             self.save_results(results, 'baseline', experiment_name)
             
-        return baseline_results  # Moved outside the loop
+        return baseline_results  
 
     def run_framework(self):
         """Run framework experiments (baseline + clustering + KD)"""
@@ -270,7 +379,7 @@ class ExperimentRunner:
             config.num_quantiles = self.args.num_quantiles
             config.cluster_on = self.args.cluster_on
 
-            # Set model based on dataset
+            # Set model based on dataset with correct input_size for HAR
             if config.dataset_name == 'mnist':
                 from models.mnist_models import MNISTTeacher
                 config.model_class = MNISTTeacher
@@ -289,8 +398,26 @@ class ExperimentRunner:
                 config.TeacherModel = SVHNTeacher
             elif config.dataset_name == 'har':
                 from models.har_models import HARTeacher
-                config.model_class = HARTeacher
-                config.TeacherModel = HARTeacher
+                # Get exact feature count for HAR dataset
+                import numpy as np
+                try:
+                    from utils.config import HAR_DIR
+                    import os
+                    import pandas as pd
+                    har_train_file = os.path.join(HAR_DIR, "har_train.csv")
+                    if os.path.exists(har_train_file):
+                        # Count number of columns (excluding Activity column)
+                        cols = pd.read_csv(har_train_file, nrows=1).shape[1] - 1
+                        self.logger.info(f"Detected {cols} features in HAR dataset")
+                        config.model_class = lambda: HARTeacher(input_size=cols)
+                        config.TeacherModel = lambda: HARTeacher(input_size=cols)
+                    else:
+                        config.model_class = HARTeacher
+                        config.TeacherModel = HARTeacher
+                except Exception as e:
+                    self.logger.error(f"Error determining HAR input size: {str(e)}")
+                    config.model_class = HARTeacher
+                    config.TeacherModel = HARTeacher
 
             # Set clustering object based on DP flag
             if self.args.use_dp_clustering:
@@ -555,6 +682,17 @@ class ExperimentRunner:
             self.logger.error(f"Error in _calculate_statistical_significance: {str(e)}")
             
         return significance_results
+
+    def _get_serializable_config(self, config):
+        """Convert config object to a serializable dictionary."""
+        config_dict = {}
+        for key, value in vars(config).items():
+            # Skip non-serializable objects (like model classes, clustering objects)
+            if key in ['model_class', 'TeacherModel', 'clustering']:
+                config_dict[key] = str(value)
+            else:
+                config_dict[key] = value
+        return config_dict
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Federated Learning Experiments")

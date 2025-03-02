@@ -74,11 +74,18 @@ class FedNovaServer(BaseServer):
         self.global_model.load_state_dict(agg_state_dict)
         return self.global_model
 
-    def evaluate_global_model(self, test_data, test_labels):
-        """Evaluate the global model on the test dataset."""
-        metrics = self.evaluate_model(self.global_model, test_data, test_labels)
-        self.logger.info(f"Global Model Evaluation - Accuracy: {metrics['accuracy']:.4f}, F1 Score: {metrics['f1_score']:.4f}")
-        return metrics
+    def evaluate_global_model(self, test_data=None, test_labels=None):
+        """Evaluate the global model on the test dataset.
+        
+        If test_data and test_labels are not provided, uses the server's test_loader instead.
+        """
+        if test_data is None and self.test_loader is not None:
+            return self.evaluate_model(self.global_model, self.test_loader)
+        elif test_data is not None:
+            return self.evaluate_model(self.global_model, test_data, test_labels)
+        else:
+            self.logger.warning("No test data available for evaluation")
+            return None
 
 class FedNovaClient(BaseClient):
     def __init__(self, client_id, dataloader):
