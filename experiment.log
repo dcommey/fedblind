@@ -28462,3 +28462,821 @@ Overall Progress: [2/8] (25.0%)
     }
   }
 }
+2025-03-02 16:15:12,432 - INFO - Experiment run started at 20250302_161512
+2025-03-02 16:15:12,432 - INFO - Saving results to directory: results
+2025-03-02 16:15:12,433 - INFO - 
+======================================================================
+2025-03-02 16:15:12,433 - INFO - Starting Baseline Experiments
+2025-03-02 16:15:12,433 - INFO - ======================================================================
+2025-03-02 16:15:12,433 - INFO - Running baseline experiment: fedavg_alpha_0.5
+2025-03-02 16:15:12,434 - INFO - Initializing framework with fedavg algorithm
+2025-03-02 16:15:15,851 - INFO - Starting training with 1 clusters
+2025-03-02 16:15:15,851 - INFO - Cluster 0 has 10 clients
+2025-03-02 16:15:15,851 - INFO - Training cluster 1/1
+2025-03-02 16:15:15,852 - INFO - Cluster 1 has 10 clients
+2025-03-02 16:15:15,857 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:15:19,507 - INFO - Client 0 - Round 0 - Loss: 0.6483, Accuracy: 0.8074
+2025-03-02 16:15:25,634 - INFO - Client 1 - Round 0 - Loss: 0.4346, Accuracy: 0.8758
+2025-03-02 16:15:32,386 - INFO - Client 2 - Round 0 - Loss: 0.5854, Accuracy: 0.8219
+2025-03-02 16:15:43,055 - INFO - Client 3 - Round 0 - Loss: 0.4982, Accuracy: 0.8496
+2025-03-02 16:15:48,508 - INFO - Client 4 - Round 0 - Loss: 0.4140, Accuracy: 0.8858
+2025-03-02 16:15:55,366 - INFO - Client 5 - Round 0 - Loss: 0.4544, Accuracy: 0.8549
+2025-03-02 16:16:04,680 - INFO - Client 6 - Round 0 - Loss: 0.4464, Accuracy: 0.8645
+2025-03-02 16:16:10,323 - INFO - Client 7 - Round 0 - Loss: 0.5464, Accuracy: 0.8291
+2025-03-02 16:16:17,820 - INFO - Client 8 - Round 0 - Loss: 0.5819, Accuracy: 0.8187
+2025-03-02 16:16:25,828 - INFO - Client 9 - Round 0 - Loss: 0.4391, Accuracy: 0.8676
+2025-03-02 16:16:27,553 - INFO - Round 0 - Global Model Accuracy: 0.8994
+2025-03-02 16:16:29,252 - INFO - Round 1 Metrics - Loss: 0.4147, Accuracy: 0.8994
+2025-03-02 16:16:29,253 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:16:32,907 - INFO - Client 0 - Round 1 - Loss: 0.2533, Accuracy: 0.9248
+2025-03-02 16:16:39,103 - INFO - Client 1 - Round 1 - Loss: 0.1928, Accuracy: 0.9435
+2025-03-02 16:16:45,828 - INFO - Client 2 - Round 1 - Loss: 0.3088, Accuracy: 0.9027
+2025-03-02 16:16:56,521 - INFO - Client 3 - Round 1 - Loss: 0.2774, Accuracy: 0.9169
+2025-03-02 16:17:01,991 - INFO - Client 4 - Round 1 - Loss: 0.1647, Accuracy: 0.9520
+2025-03-02 16:17:08,863 - INFO - Client 5 - Round 1 - Loss: 0.2313, Accuracy: 0.9245
+2025-03-02 16:17:18,140 - INFO - Client 6 - Round 1 - Loss: 0.2536, Accuracy: 0.9219
+2025-03-02 16:17:23,824 - INFO - Client 7 - Round 1 - Loss: 0.2492, Accuracy: 0.9228
+2025-03-02 16:17:31,271 - INFO - Client 8 - Round 1 - Loss: 0.2945, Accuracy: 0.9069
+2025-03-02 16:17:39,372 - INFO - Client 9 - Round 1 - Loss: 0.2249, Accuracy: 0.9317
+2025-03-02 16:17:41,045 - INFO - Round 1 - Global Model Accuracy: 0.9310
+2025-03-02 16:17:42,746 - INFO - Round 2 Metrics - Loss: 0.2328, Accuracy: 0.9310
+2025-03-02 16:17:42,747 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:17:46,435 - INFO - Client 0 - Round 2 - Loss: 0.1816, Accuracy: 0.9469
+2025-03-02 16:17:52,669 - INFO - Client 1 - Round 2 - Loss: 0.1455, Accuracy: 0.9558
+2025-03-02 16:17:59,371 - INFO - Client 2 - Round 2 - Loss: 0.2466, Accuracy: 0.9224
+2025-03-02 16:18:10,049 - INFO - Client 3 - Round 2 - Loss: 0.2215, Accuracy: 0.9320
+2025-03-02 16:18:15,439 - INFO - Client 4 - Round 2 - Loss: 0.1174, Accuracy: 0.9645
+2025-03-02 16:18:22,322 - INFO - Client 5 - Round 2 - Loss: 0.1831, Accuracy: 0.9439
+2025-03-02 16:18:31,618 - INFO - Client 6 - Round 2 - Loss: 0.2005, Accuracy: 0.9380
+2025-03-02 16:18:37,296 - INFO - Client 7 - Round 2 - Loss: 0.1823, Accuracy: 0.9430
+2025-03-02 16:18:44,725 - INFO - Client 8 - Round 2 - Loss: 0.2227, Accuracy: 0.9305
+2025-03-02 16:18:52,727 - INFO - Client 9 - Round 2 - Loss: 0.1785, Accuracy: 0.9462
+2025-03-02 16:18:54,417 - INFO - Round 2 - Global Model Accuracy: 0.9441
+2025-03-02 16:18:56,129 - INFO - Round 3 Metrics - Loss: 0.1820, Accuracy: 0.9441
+2025-03-02 16:18:56,130 - INFO - Finished training for cluster 1/1
+2025-03-02 16:18:56,130 - INFO - 
+Training Summary:
+2025-03-02 16:18:56,130 - INFO - Total clusters: 1
+2025-03-02 16:18:56,130 - INFO - Rounds per cluster: 3
+2025-03-02 16:18:56,130 - INFO - Total cluster models: 1
+2025-03-02 16:18:56,131 - INFO - Saved results to results\baseline\fedavg_alpha_0.5.json
+2025-03-02 16:18:56,133 - INFO - Saved results to results\baseline\fedavg_alpha_0.5.json
+2025-03-02 16:18:56,133 - INFO - Running baseline experiment: fedprox_alpha_0.5
+2025-03-02 16:18:56,133 - INFO - Initializing framework with fedprox algorithm
+2025-03-02 16:18:59,476 - INFO - Starting training with 1 clusters
+2025-03-02 16:18:59,476 - INFO - Cluster 0 has 10 clients
+2025-03-02 16:18:59,476 - INFO - Training cluster 1/1
+2025-03-02 16:18:59,477 - INFO - Cluster 1 has 10 clients
+2025-03-02 16:18:59,480 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:19:17,035 - INFO - Client 0 - Round 0 - Loss: 0.2356, Accuracy: 0.9364
+2025-03-02 16:19:22,562 - INFO - Client 1 - Round 0 - Loss: 0.6343, Accuracy: 0.8075
+2025-03-02 16:19:28,988 - INFO - Client 2 - Round 0 - Loss: 0.6093, Accuracy: 0.8182
+2025-03-02 16:19:36,944 - INFO - Client 3 - Round 0 - Loss: 0.3931, Accuracy: 0.8865
+2025-03-02 16:19:49,256 - INFO - Client 4 - Round 0 - Loss: 0.3999, Accuracy: 0.8821
+2025-03-02 16:19:58,301 - INFO - Client 5 - Round 0 - Loss: 0.4203, Accuracy: 0.8780
+2025-03-02 16:20:00,799 - INFO - Client 6 - Round 0 - Loss: 0.7048, Accuracy: 0.7880
+2025-03-02 16:20:04,718 - INFO - Client 7 - Round 0 - Loss: 0.5110, Accuracy: 0.8567
+2025-03-02 16:20:10,370 - INFO - Client 8 - Round 0 - Loss: 0.2860, Accuracy: 0.9227
+2025-03-02 16:20:20,263 - INFO - Client 9 - Round 0 - Loss: 0.3594, Accuracy: 0.8957
+2025-03-02 16:20:21,952 - INFO - Round 0 - Global Model Accuracy: 0.8288
+2025-03-02 16:20:23,653 - INFO - Round 1 Metrics - Loss: 0.5585, Accuracy: 0.8288
+2025-03-02 16:20:23,653 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:20:40,927 - INFO - Client 0 - Round 1 - Loss: 0.1495, Accuracy: 0.9580
+2025-03-02 16:20:46,249 - INFO - Client 1 - Round 1 - Loss: 0.3494, Accuracy: 0.8912
+2025-03-02 16:20:52,647 - INFO - Client 2 - Round 1 - Loss: 0.3451, Accuracy: 0.8938
+2025-03-02 16:21:00,393 - INFO - Client 3 - Round 1 - Loss: 0.2367, Accuracy: 0.9262
+2025-03-02 16:21:12,697 - INFO - Client 4 - Round 1 - Loss: 0.2642, Accuracy: 0.9183
+2025-03-02 16:21:21,746 - INFO - Client 5 - Round 1 - Loss: 0.2436, Accuracy: 0.9271
+2025-03-02 16:21:24,270 - INFO - Client 6 - Round 1 - Loss: 0.3068, Accuracy: 0.8964
+2025-03-02 16:21:28,180 - INFO - Client 7 - Round 1 - Loss: 0.2536, Accuracy: 0.9219
+2025-03-02 16:21:33,609 - INFO - Client 8 - Round 1 - Loss: 0.1298, Accuracy: 0.9620
+2025-03-02 16:21:43,557 - INFO - Client 9 - Round 1 - Loss: 0.2048, Accuracy: 0.9386
+2025-03-02 16:21:45,288 - INFO - Round 1 - Global Model Accuracy: 0.9188
+2025-03-02 16:21:47,069 - INFO - Round 2 Metrics - Loss: 0.2724, Accuracy: 0.9188
+2025-03-02 16:21:47,069 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:22:04,285 - INFO - Client 0 - Round 2 - Loss: 0.1215, Accuracy: 0.9653
+2025-03-02 16:22:09,611 - INFO - Client 1 - Round 2 - Loss: 0.2697, Accuracy: 0.9170
+2025-03-02 16:22:15,978 - INFO - Client 2 - Round 2 - Loss: 0.2570, Accuracy: 0.9212
+2025-03-02 16:22:23,797 - INFO - Client 3 - Round 2 - Loss: 0.1873, Accuracy: 0.9443
+2025-03-02 16:22:36,014 - INFO - Client 4 - Round 2 - Loss: 0.2186, Accuracy: 0.9325
+2025-03-02 16:22:45,077 - INFO - Client 5 - Round 2 - Loss: 0.1879, Accuracy: 0.9434
+2025-03-02 16:22:47,627 - INFO - Client 6 - Round 2 - Loss: 0.2336, Accuracy: 0.9244
+2025-03-02 16:22:51,540 - INFO - Client 7 - Round 2 - Loss: 0.1896, Accuracy: 0.9431
+2025-03-02 16:22:56,981 - INFO - Client 8 - Round 2 - Loss: 0.0982, Accuracy: 0.9712
+2025-03-02 16:23:06,865 - INFO - Client 9 - Round 2 - Loss: 0.1576, Accuracy: 0.9530
+2025-03-02 16:23:08,550 - INFO - Round 2 - Global Model Accuracy: 0.9426
+2025-03-02 16:23:10,257 - INFO - Round 3 Metrics - Loss: 0.1914, Accuracy: 0.9426
+2025-03-02 16:23:10,257 - INFO - Finished training for cluster 1/1
+2025-03-02 16:23:10,257 - INFO - 
+Training Summary:
+2025-03-02 16:23:10,257 - INFO - Total clusters: 1
+2025-03-02 16:23:10,257 - INFO - Rounds per cluster: 3
+2025-03-02 16:23:10,257 - INFO - Total cluster models: 1
+2025-03-02 16:23:10,258 - INFO - Saved results to results\baseline\fedprox_alpha_0.5.json
+2025-03-02 16:23:10,261 - INFO - Saved results to results\baseline\fedprox_alpha_0.5.json
+2025-03-02 16:23:10,261 - INFO - Running baseline experiment: scaffold_alpha_0.5
+2025-03-02 16:23:10,261 - INFO - Initializing framework with scaffold algorithm
+2025-03-02 16:23:13,610 - INFO - Starting training with 1 clusters
+2025-03-02 16:23:13,610 - INFO - Cluster 0 has 10 clients
+2025-03-02 16:23:13,610 - INFO - Training cluster 1/1
+2025-03-02 16:23:13,610 - INFO - Cluster 1 has 10 clients
+2025-03-02 16:23:13,615 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:23:21,140 - INFO - Client 0 - Round 0 - Loss: 0.3879, Accuracy: 0.8919
+2025-03-02 16:23:29,496 - INFO - Client 1 - Round 0 - Loss: 0.4637, Accuracy: 0.8544
+2025-03-02 16:23:34,914 - INFO - Client 2 - Round 0 - Loss: 0.4976, Accuracy: 0.8466
+2025-03-02 16:23:40,073 - INFO - Client 3 - Round 0 - Loss: 0.3213, Accuracy: 0.9065
+2025-03-02 16:23:47,266 - INFO - Client 4 - Round 0 - Loss: 0.4279, Accuracy: 0.8704
+2025-03-02 16:24:01,788 - INFO - Client 5 - Round 0 - Loss: 0.3717, Accuracy: 0.8880
+2025-03-02 16:24:11,230 - INFO - Client 6 - Round 0 - Loss: 0.5073, Accuracy: 0.8473
+2025-03-02 16:24:15,332 - INFO - Client 7 - Round 0 - Loss: 0.4774, Accuracy: 0.8622
+2025-03-02 16:24:20,831 - INFO - Client 8 - Round 0 - Loss: 0.3724, Accuracy: 0.9021
+2025-03-02 16:24:26,895 - INFO - Client 9 - Round 0 - Loss: 0.3752, Accuracy: 0.8936
+2025-03-02 16:24:28,604 - INFO - Round 0 - Global Model Accuracy: 0.8544
+2025-03-02 16:24:30,319 - INFO - Round 1 Metrics - Loss: 0.5071, Accuracy: 0.8544
+2025-03-02 16:24:30,319 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:24:37,657 - INFO - Client 0 - Round 1 - Loss: 0.2205, Accuracy: 0.9343
+2025-03-02 16:24:46,170 - INFO - Client 1 - Round 1 - Loss: 0.3065, Accuracy: 0.9025
+2025-03-02 16:24:51,840 - INFO - Client 2 - Round 1 - Loss: 0.2604, Accuracy: 0.9208
+2025-03-02 16:24:57,033 - INFO - Client 3 - Round 1 - Loss: 0.1608, Accuracy: 0.9520
+2025-03-02 16:25:04,420 - INFO - Client 4 - Round 1 - Loss: 0.2673, Accuracy: 0.9167
+2025-03-02 16:25:19,384 - INFO - Client 5 - Round 1 - Loss: 0.2731, Accuracy: 0.9157
+2025-03-02 16:25:28,729 - INFO - Client 6 - Round 1 - Loss: 0.3469, Accuracy: 0.8939
+2025-03-02 16:25:32,809 - INFO - Client 7 - Round 1 - Loss: 0.2259, Accuracy: 0.9299
+2025-03-02 16:25:38,339 - INFO - Client 8 - Round 1 - Loss: 0.1623, Accuracy: 0.9530
+2025-03-02 16:25:44,439 - INFO - Client 9 - Round 1 - Loss: 0.1815, Accuracy: 0.9459
+2025-03-02 16:25:46,112 - INFO - Round 1 - Global Model Accuracy: 0.9118
+2025-03-02 16:25:47,818 - INFO - Round 2 Metrics - Loss: 0.2878, Accuracy: 0.9118
+2025-03-02 16:25:47,818 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:25:55,038 - INFO - Client 0 - Round 2 - Loss: 0.1812, Accuracy: 0.9458
+2025-03-02 16:26:03,452 - INFO - Client 1 - Round 2 - Loss: 0.2618, Accuracy: 0.9174
+2025-03-02 16:26:08,908 - INFO - Client 2 - Round 2 - Loss: 0.2110, Accuracy: 0.9359
+2025-03-02 16:26:13,970 - INFO - Client 3 - Round 2 - Loss: 0.1427, Accuracy: 0.9572
+2025-03-02 16:26:21,157 - INFO - Client 4 - Round 2 - Loss: 0.2302, Accuracy: 0.9292
+2025-03-02 16:26:35,743 - INFO - Client 5 - Round 2 - Loss: 0.2395, Accuracy: 0.9267
+2025-03-02 16:26:44,966 - INFO - Client 6 - Round 2 - Loss: 0.2962, Accuracy: 0.9083
+2025-03-02 16:26:48,961 - INFO - Client 7 - Round 2 - Loss: 0.1743, Accuracy: 0.9430
+2025-03-02 16:26:54,382 - INFO - Client 8 - Round 2 - Loss: 0.1478, Accuracy: 0.9577
+2025-03-02 16:27:00,442 - INFO - Client 9 - Round 2 - Loss: 0.1430, Accuracy: 0.9591
+2025-03-02 16:27:02,217 - INFO - Round 2 - Global Model Accuracy: 0.9145
+2025-03-02 16:27:03,940 - INFO - Round 3 Metrics - Loss: 0.2637, Accuracy: 0.9145
+2025-03-02 16:27:03,941 - INFO - Finished training for cluster 1/1
+2025-03-02 16:27:03,941 - INFO - 
+Training Summary:
+2025-03-02 16:27:03,941 - INFO - Total clusters: 1
+2025-03-02 16:27:03,941 - INFO - Rounds per cluster: 3
+2025-03-02 16:27:03,941 - INFO - Total cluster models: 1
+2025-03-02 16:27:03,942 - INFO - Saved results to results\baseline\scaffold_alpha_0.5.json
+2025-03-02 16:27:03,946 - INFO - Saved results to results\baseline\scaffold_alpha_0.5.json
+2025-03-02 16:27:03,947 - INFO - Running baseline experiment: fednova_alpha_0.5
+2025-03-02 16:27:03,947 - INFO - Initializing framework with fednova algorithm
+2025-03-02 16:27:07,289 - INFO - Starting training with 1 clusters
+2025-03-02 16:27:07,290 - INFO - Cluster 0 has 10 clients
+2025-03-02 16:27:07,290 - INFO - Training cluster 1/1
+2025-03-02 16:27:07,290 - INFO - Cluster 1 has 10 clients
+2025-03-02 16:27:07,294 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:27:13,092 - INFO - Client 0 - Round 0 - Loss: 0.5046, Accuracy: 0.8461, Norm Factor: 5.7492
+2025-03-02 16:27:21,233 - INFO - Client 1 - Round 0 - Loss: 0.3231, Accuracy: 0.9078, Norm Factor: 5.0915
+2025-03-02 16:27:29,235 - INFO - Client 2 - Round 0 - Loss: 0.4213, Accuracy: 0.8717, Norm Factor: 5.6138
+2025-03-02 16:27:32,468 - INFO - Client 3 - Round 0 - Loss: 0.6354, Accuracy: 0.8094, Norm Factor: 5.9608
+2025-03-02 16:27:37,346 - INFO - Client 4 - Round 0 - Loss: 0.4599, Accuracy: 0.8645, Norm Factor: 5.0372
+2025-03-02 16:27:39,684 - INFO - Client 5 - Round 0 - Loss: 0.7187, Accuracy: 0.7748, Norm Factor: 5.5396
+2025-03-02 16:27:46,570 - INFO - Client 6 - Round 0 - Loss: 0.3750, Accuracy: 0.8910, Norm Factor: 4.9241
+2025-03-02 16:27:53,612 - INFO - Client 7 - Round 0 - Loss: 0.4182, Accuracy: 0.8724, Norm Factor: 5.7426
+2025-03-02 16:28:02,621 - INFO - Client 8 - Round 0 - Loss: 0.4662, Accuracy: 0.8526, Norm Factor: 5.9073
+2025-03-02 16:28:18,078 - INFO - Client 9 - Round 0 - Loss: 0.4600, Accuracy: 0.8540, Norm Factor: 6.2688
+2025-03-02 16:28:19,799 - INFO - Round 0 - Global Model Accuracy: 0.8786
+2025-03-02 16:28:21,470 - INFO - Round 1 Metrics - Loss: 0.4660, Accuracy: 0.8786
+2025-03-02 16:28:21,470 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:28:27,139 - INFO - Client 0 - Round 1 - Loss: 0.2825, Accuracy: 0.9131, Norm Factor: 5.9337
+2025-03-02 16:28:35,269 - INFO - Client 1 - Round 1 - Loss: 0.1776, Accuracy: 0.9471, Norm Factor: 5.0287
+2025-03-02 16:28:43,417 - INFO - Client 2 - Round 1 - Loss: 0.2378, Accuracy: 0.9266, Norm Factor: 5.6906
+2025-03-02 16:28:46,617 - INFO - Client 3 - Round 1 - Loss: 0.2775, Accuracy: 0.9098, Norm Factor: 6.3310
+2025-03-02 16:28:51,469 - INFO - Client 4 - Round 1 - Loss: 0.2281, Accuracy: 0.9274, Norm Factor: 5.4019
+2025-03-02 16:28:53,791 - INFO - Client 5 - Round 1 - Loss: 0.3347, Accuracy: 0.8903, Norm Factor: 6.7274
+2025-03-02 16:29:00,617 - INFO - Client 6 - Round 1 - Loss: 0.2043, Accuracy: 0.9385, Norm Factor: 5.1606
+2025-03-02 16:29:07,642 - INFO - Client 7 - Round 1 - Loss: 0.2384, Accuracy: 0.9283, Norm Factor: 5.8974
+2025-03-02 16:29:16,671 - INFO - Client 8 - Round 1 - Loss: 0.2918, Accuracy: 0.9068, Norm Factor: 6.0523
+2025-03-02 16:29:32,443 - INFO - Client 9 - Round 1 - Loss: 0.3267, Accuracy: 0.8957, Norm Factor: 6.2615
+2025-03-02 16:29:34,149 - INFO - Round 1 - Global Model Accuracy: 0.9270
+2025-03-02 16:29:35,847 - INFO - Round 2 Metrics - Loss: 0.2578, Accuracy: 0.9270
+2025-03-02 16:29:35,847 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:29:41,567 - INFO - Client 0 - Round 2 - Loss: 0.2391, Accuracy: 0.9282, Norm Factor: 5.3942
+2025-03-02 16:29:49,740 - INFO - Client 1 - Round 2 - Loss: 0.1443, Accuracy: 0.9573, Norm Factor: 4.4622
+2025-03-02 16:29:57,528 - INFO - Client 2 - Round 2 - Loss: 0.1869, Accuracy: 0.9429, Norm Factor: 5.0934
+2025-03-02 16:30:00,728 - INFO - Client 3 - Round 2 - Loss: 0.2113, Accuracy: 0.9331, Norm Factor: 5.4833
+2025-03-02 16:30:05,566 - INFO - Client 4 - Round 2 - Loss: 0.1751, Accuracy: 0.9472, Norm Factor: 4.7461
+2025-03-02 16:30:07,934 - INFO - Client 5 - Round 2 - Loss: 0.2581, Accuracy: 0.9169, Norm Factor: 6.1297
+2025-03-02 16:30:14,815 - INFO - Client 6 - Round 2 - Loss: 0.1626, Accuracy: 0.9487, Norm Factor: 4.6584
+2025-03-02 16:30:21,844 - INFO - Client 7 - Round 2 - Loss: 0.1963, Accuracy: 0.9412, Norm Factor: 5.2785
+2025-03-02 16:30:30,936 - INFO - Client 8 - Round 2 - Loss: 0.2333, Accuracy: 0.9280, Norm Factor: 5.4759
+2025-03-02 16:30:46,766 - INFO - Client 9 - Round 2 - Loss: 0.2712, Accuracy: 0.9136, Norm Factor: 5.6843
+2025-03-02 16:30:48,510 - INFO - Round 2 - Global Model Accuracy: 0.9415
+2025-03-02 16:30:50,175 - INFO - Round 3 Metrics - Loss: 0.2031, Accuracy: 0.9415
+2025-03-02 16:30:50,176 - INFO - Finished training for cluster 1/1
+2025-03-02 16:30:50,176 - INFO - 
+Training Summary:
+2025-03-02 16:30:50,176 - INFO - Total clusters: 1
+2025-03-02 16:30:50,176 - INFO - Rounds per cluster: 3
+2025-03-02 16:30:50,176 - INFO - Total cluster models: 1
+2025-03-02 16:30:50,177 - INFO - Saved results to results\baseline\fednova_alpha_0.5.json
+2025-03-02 16:30:50,180 - INFO - Saved results to results\baseline\fednova_alpha_0.5.json
+2025-03-02 16:30:50,180 - INFO - 
+Overall Progress: [1/8] (12.5%)
+
+2025-03-02 16:30:50,180 - INFO - 
+======================================================================
+2025-03-02 16:30:50,180 - INFO - Starting Framework Experiments (Baseline + Clustering + KD)
+2025-03-02 16:30:50,181 - INFO - ======================================================================
+2025-03-02 16:30:50,181 - INFO - Running framework experiments...
+2025-03-02 16:30:50,181 - INFO - Running framework: fedavg_framework_alpha_0.5
+2025-03-02 16:30:50,247 - INFO - Initializing framework with fedavg algorithm
+2025-03-02 16:30:57,190 - INFO - Created 2 clusters
+2025-03-02 16:30:57,190 - INFO - Cluster 0 has 6 clients
+2025-03-02 16:30:57,190 - INFO - Cluster 1 has 4 clients
+2025-03-02 16:30:57,190 - INFO - Starting training with 2 clusters
+2025-03-02 16:30:57,190 - INFO - Cluster 0 has 6 clients
+2025-03-02 16:30:57,191 - INFO - Cluster 1 has 4 clients
+2025-03-02 16:30:57,191 - INFO - Training cluster 1/2
+2025-03-02 16:30:57,191 - INFO - Cluster 1 has 6 clients
+2025-03-02 16:30:57,197 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:31:02,539 - INFO - Client 0 - Round 0 - Loss: 0.5387, Accuracy: 0.8301
+2025-03-02 16:31:09,739 - INFO - Client 2 - Round 0 - Loss: 0.4252, Accuracy: 0.8682
+2025-03-02 16:31:15,839 - INFO - Client 3 - Round 0 - Loss: 0.4783, Accuracy: 0.8546
+2025-03-02 16:31:24,961 - INFO - Client 4 - Round 0 - Loss: 0.3896, Accuracy: 0.8824
+2025-03-02 16:31:33,482 - INFO - Client 8 - Round 0 - Loss: 0.5032, Accuracy: 0.8501
+2025-03-02 16:31:40,572 - INFO - Client 9 - Round 0 - Loss: 0.4135, Accuracy: 0.8778
+2025-03-02 16:31:42,288 - INFO - Round 0 - Global Model Accuracy: 0.8128
+2025-03-02 16:31:43,930 - INFO - Round 1 Metrics - Loss: 0.6091, Accuracy: 0.8128
+2025-03-02 16:31:43,931 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:31:49,442 - INFO - Client 0 - Round 1 - Loss: 0.2953, Accuracy: 0.9100
+2025-03-02 16:31:56,756 - INFO - Client 2 - Round 1 - Loss: 0.2452, Accuracy: 0.9225
+2025-03-02 16:32:02,869 - INFO - Client 3 - Round 1 - Loss: 0.2645, Accuracy: 0.9206
+2025-03-02 16:32:12,095 - INFO - Client 4 - Round 1 - Loss: 0.2359, Accuracy: 0.9285
+2025-03-02 16:32:20,544 - INFO - Client 8 - Round 1 - Loss: 0.2941, Accuracy: 0.9094
+2025-03-02 16:32:27,659 - INFO - Client 9 - Round 1 - Loss: 0.2130, Accuracy: 0.9354
+2025-03-02 16:32:29,376 - INFO - Round 1 - Global Model Accuracy: 0.8643
+2025-03-02 16:32:31,056 - INFO - Round 2 Metrics - Loss: 0.3747, Accuracy: 0.8643
+2025-03-02 16:32:31,056 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:32:36,593 - INFO - Client 0 - Round 2 - Loss: 0.2242, Accuracy: 0.9313
+2025-03-02 16:32:43,896 - INFO - Client 2 - Round 2 - Loss: 0.1789, Accuracy: 0.9417
+2025-03-02 16:32:50,103 - INFO - Client 3 - Round 2 - Loss: 0.2032, Accuracy: 0.9381
+2025-03-02 16:32:59,264 - INFO - Client 4 - Round 2 - Loss: 0.1802, Accuracy: 0.9446
+2025-03-02 16:33:07,759 - INFO - Client 8 - Round 2 - Loss: 0.2195, Accuracy: 0.9317
+2025-03-02 16:33:14,852 - INFO - Client 9 - Round 2 - Loss: 0.1590, Accuracy: 0.9506
+2025-03-02 16:33:16,610 - INFO - Round 2 - Global Model Accuracy: 0.9074
+2025-03-02 16:33:18,300 - INFO - Round 3 Metrics - Loss: 0.2649, Accuracy: 0.9074
+2025-03-02 16:33:18,300 - INFO - Finished training for cluster 1/2
+2025-03-02 16:33:18,300 - INFO - Training cluster 2/2
+2025-03-02 16:33:18,300 - INFO - Cluster 2 has 4 clients
+2025-03-02 16:33:18,305 - INFO - Starting round 1/3 for cluster 2
+2025-03-02 16:33:24,737 - INFO - Client 1 - Round 0 - Loss: 0.3679, Accuracy: 0.9006
+2025-03-02 16:33:28,658 - INFO - Client 5 - Round 0 - Loss: 0.7309, Accuracy: 0.7759
+2025-03-02 16:33:34,455 - INFO - Client 6 - Round 0 - Loss: 0.6286, Accuracy: 0.8089
+2025-03-02 16:33:45,121 - INFO - Client 7 - Round 0 - Loss: 0.4309, Accuracy: 0.8742
+2025-03-02 16:33:46,864 - INFO - Round 0 - Global Model Accuracy: 0.8432
+2025-03-02 16:33:48,567 - INFO - Round 1 Metrics - Loss: 0.4884, Accuracy: 0.8432
+2025-03-02 16:33:48,567 - INFO - Starting round 2/3 for cluster 2
+2025-03-02 16:33:55,048 - INFO - Client 1 - Round 1 - Loss: 0.1402, Accuracy: 0.9607
+2025-03-02 16:33:58,946 - INFO - Client 5 - Round 1 - Loss: 0.2605, Accuracy: 0.9207
+2025-03-02 16:34:04,727 - INFO - Client 6 - Round 1 - Loss: 0.2869, Accuracy: 0.9114
+2025-03-02 16:34:15,207 - INFO - Client 7 - Round 1 - Loss: 0.2154, Accuracy: 0.9341
+2025-03-02 16:34:16,929 - INFO - Round 1 - Global Model Accuracy: 0.9015
+2025-03-02 16:34:18,628 - INFO - Round 2 Metrics - Loss: 0.3057, Accuracy: 0.9015
+2025-03-02 16:34:18,628 - INFO - Starting round 3/3 for cluster 2
+2025-03-02 16:34:25,017 - INFO - Client 1 - Round 2 - Loss: 0.1042, Accuracy: 0.9694
+2025-03-02 16:34:28,940 - INFO - Client 5 - Round 2 - Loss: 0.1875, Accuracy: 0.9421
+2025-03-02 16:34:34,730 - INFO - Client 6 - Round 2 - Loss: 0.2202, Accuracy: 0.9326
+2025-03-02 16:34:45,438 - INFO - Client 7 - Round 2 - Loss: 0.1648, Accuracy: 0.9492
+2025-03-02 16:34:47,186 - INFO - Round 2 - Global Model Accuracy: 0.9134
+2025-03-02 16:34:48,920 - INFO - Round 3 Metrics - Loss: 0.2732, Accuracy: 0.9134
+2025-03-02 16:34:48,921 - INFO - Finished training for cluster 2/2
+2025-03-02 16:34:48,921 - INFO - 
+Training Summary:
+2025-03-02 16:34:48,921 - INFO - Total clusters: 2
+2025-03-02 16:34:48,921 - INFO - Rounds per cluster: 3
+2025-03-02 16:34:48,921 - INFO - Total cluster models: 2
+2025-03-02 16:34:50,348 - INFO - Starting final knowledge distillation process
+2025-03-02 16:34:52,576 - INFO - Teacher model 0 produced predictions successfully
+2025-03-02 16:34:54,698 - INFO - Teacher model 1 produced predictions successfully
+2025-03-02 16:34:54,698 - INFO - Teacher logits shape: torch.Size([18000, 10])
+2025-03-02 16:34:54,698 - INFO - Student model expects input shape matching: [torch.Size([18000, 1, 28, 28])]
+2025-03-02 16:34:57,121 - INFO - Epoch 1/10, Train Loss: 0.4079, Val Loss: 0.9730, Val Accuracy: 0.9115
+2025-03-02 16:34:59,429 - INFO - Epoch 2/10, Train Loss: 0.3971, Val Loss: 0.9390, Val Accuracy: 0.9268
+2025-03-02 16:35:01,734 - INFO - Epoch 3/10, Train Loss: 0.3956, Val Loss: 0.9328, Val Accuracy: 0.9551
+2025-03-02 16:35:04,041 - INFO - Epoch 4/10, Train Loss: 0.3916, Val Loss: 0.9302, Val Accuracy: 0.9305
+2025-03-02 16:35:06,298 - INFO - Epoch 5/10, Train Loss: 0.3859, Val Loss: 0.8851, Val Accuracy: 0.9543
+2025-03-02 16:35:08,641 - INFO - Epoch 6/10, Train Loss: 0.3840, Val Loss: 0.8567, Val Accuracy: 0.9490
+2025-03-02 16:35:10,954 - INFO - Epoch 7/10, Train Loss: 0.3827, Val Loss: 0.7937, Val Accuracy: 0.9558
+2025-03-02 16:35:13,238 - INFO - Epoch 8/10, Train Loss: 0.3823, Val Loss: 0.8132, Val Accuracy: 0.9429
+2025-03-02 16:35:15,567 - INFO - Epoch 9/10, Train Loss: 0.3820, Val Loss: 0.9714, Val Accuracy: 0.9533
+2025-03-02 16:35:17,911 - INFO - Epoch 10/10, Train Loss: 0.3819, Val Loss: 0.8045, Val Accuracy: 0.9535
+2025-03-02 16:35:18,993 - INFO - Final student model accuracy: 0.9558
+2025-03-02 16:35:18,993 - INFO - 
+Final Student Model Results:
+2025-03-02 16:35:18,994 - INFO - Accuracy: 0.9558
+2025-03-02 16:35:18,994 - INFO - Loss: 0.7937
+2025-03-02 16:35:18,994 - INFO - F1 Score: 0.9560
+2025-03-02 16:35:18,995 - INFO - Saved results to results\framework\fedavg_framework_alpha_0.5.json
+2025-03-02 16:35:18,997 - INFO - Saved results to results\framework\fedavg_framework_alpha_0.5.json
+2025-03-02 16:35:18,997 - INFO - Running framework: fedprox_framework_alpha_0.5
+2025-03-02 16:35:18,997 - INFO - Initializing framework with fedprox algorithm
+2025-03-02 16:35:25,849 - INFO - Created 2 clusters
+2025-03-02 16:35:25,849 - INFO - Cluster 0 has 6 clients
+2025-03-02 16:35:25,850 - INFO - Cluster 1 has 4 clients
+2025-03-02 16:35:25,850 - INFO - Starting training with 2 clusters
+2025-03-02 16:35:25,850 - INFO - Cluster 0 has 6 clients
+2025-03-02 16:35:25,850 - INFO - Cluster 1 has 4 clients
+2025-03-02 16:35:25,850 - INFO - Training cluster 1/2
+2025-03-02 16:35:25,850 - INFO - Cluster 1 has 6 clients
+2025-03-02 16:35:25,856 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:35:33,666 - INFO - Client 1 - Round 0 - Loss: 0.6217, Accuracy: 0.8088
+2025-03-02 16:35:42,878 - INFO - Client 2 - Round 0 - Loss: 0.4787, Accuracy: 0.8578
+2025-03-02 16:35:52,646 - INFO - Client 3 - Round 0 - Loss: 0.4648, Accuracy: 0.8575
+2025-03-02 16:36:00,249 - INFO - Client 4 - Round 0 - Loss: 0.5888, Accuracy: 0.8242
+2025-03-02 16:36:03,797 - INFO - Client 6 - Round 0 - Loss: 0.5823, Accuracy: 0.8209
+2025-03-02 16:36:13,282 - INFO - Client 9 - Round 0 - Loss: 0.4746, Accuracy: 0.8558
+2025-03-02 16:36:14,966 - INFO - Round 0 - Global Model Accuracy: 0.8649
+2025-03-02 16:36:16,682 - INFO - Round 1 Metrics - Loss: 0.4540, Accuracy: 0.8649
+2025-03-02 16:36:16,682 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:36:24,476 - INFO - Client 1 - Round 1 - Loss: 0.3355, Accuracy: 0.8964
+2025-03-02 16:36:33,779 - INFO - Client 2 - Round 1 - Loss: 0.2606, Accuracy: 0.9207
+2025-03-02 16:36:43,477 - INFO - Client 3 - Round 1 - Loss: 0.2655, Accuracy: 0.9184
+2025-03-02 16:36:51,079 - INFO - Client 4 - Round 1 - Loss: 0.3246, Accuracy: 0.9031
+2025-03-02 16:36:54,604 - INFO - Client 6 - Round 1 - Loss: 0.2177, Accuracy: 0.9298
+2025-03-02 16:37:04,267 - INFO - Client 9 - Round 1 - Loss: 0.2670, Accuracy: 0.9162
+2025-03-02 16:37:06,004 - INFO - Round 1 - Global Model Accuracy: 0.9279
+2025-03-02 16:37:07,753 - INFO - Round 2 Metrics - Loss: 0.2434, Accuracy: 0.9279
+2025-03-02 16:37:07,753 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:37:15,499 - INFO - Client 1 - Round 2 - Loss: 0.2461, Accuracy: 0.9261
+2025-03-02 16:37:24,812 - INFO - Client 2 - Round 2 - Loss: 0.1863, Accuracy: 0.9435
+2025-03-02 16:37:34,415 - INFO - Client 3 - Round 2 - Loss: 0.1901, Accuracy: 0.9420
+2025-03-02 16:37:42,032 - INFO - Client 4 - Round 2 - Loss: 0.2440, Accuracy: 0.9267
+2025-03-02 16:37:45,523 - INFO - Client 6 - Round 2 - Loss: 0.1574, Accuracy: 0.9508
+2025-03-02 16:37:55,232 - INFO - Client 9 - Round 2 - Loss: 0.2042, Accuracy: 0.9367
+2025-03-02 16:37:56,999 - INFO - Round 2 - Global Model Accuracy: 0.9486
+2025-03-02 16:37:58,725 - INFO - Round 3 Metrics - Loss: 0.1749, Accuracy: 0.9486
+2025-03-02 16:37:58,725 - INFO - Finished training for cluster 1/2
+2025-03-02 16:37:58,725 - INFO - Training cluster 2/2
+2025-03-02 16:37:58,726 - INFO - Cluster 2 has 4 clients
+2025-03-02 16:37:58,730 - INFO - Starting round 1/3 for cluster 2
+2025-03-02 16:38:08,360 - INFO - Client 0 - Round 0 - Loss: 0.4875, Accuracy: 0.8514
+2025-03-02 16:38:19,015 - INFO - Client 5 - Round 0 - Loss: 0.3526, Accuracy: 0.9030
+2025-03-02 16:38:27,413 - INFO - Client 7 - Round 0 - Loss: 0.4135, Accuracy: 0.8879
+2025-03-02 16:38:31,466 - INFO - Client 8 - Round 0 - Loss: 0.6191, Accuracy: 0.8140
+2025-03-02 16:38:33,184 - INFO - Round 0 - Global Model Accuracy: 0.7723
+2025-03-02 16:38:34,884 - INFO - Round 1 Metrics - Loss: 0.6196, Accuracy: 0.7723
+2025-03-02 16:38:34,884 - INFO - Starting round 2/3 for cluster 2
+2025-03-02 16:38:44,580 - INFO - Client 0 - Round 1 - Loss: 0.2792, Accuracy: 0.9148
+2025-03-02 16:38:55,285 - INFO - Client 5 - Round 1 - Loss: 0.1951, Accuracy: 0.9410
+2025-03-02 16:39:03,632 - INFO - Client 7 - Round 1 - Loss: 0.2042, Accuracy: 0.9399
+2025-03-02 16:39:07,723 - INFO - Client 8 - Round 1 - Loss: 0.2430, Accuracy: 0.9223
+2025-03-02 16:39:09,433 - INFO - Round 1 - Global Model Accuracy: 0.8689
+2025-03-02 16:39:11,129 - INFO - Round 2 Metrics - Loss: 0.3882, Accuracy: 0.8689
+2025-03-02 16:39:11,129 - INFO - Starting round 3/3 for cluster 2
+2025-03-02 16:39:20,786 - INFO - Client 0 - Round 2 - Loss: 0.2313, Accuracy: 0.9297
+2025-03-02 16:39:31,456 - INFO - Client 5 - Round 2 - Loss: 0.1597, Accuracy: 0.9514
+2025-03-02 16:39:39,959 - INFO - Client 7 - Round 2 - Loss: 0.1580, Accuracy: 0.9513
+2025-03-02 16:39:44,029 - INFO - Client 8 - Round 2 - Loss: 0.1806, Accuracy: 0.9389
+2025-03-02 16:39:45,741 - INFO - Round 2 - Global Model Accuracy: 0.8985
+2025-03-02 16:39:47,477 - INFO - Round 3 Metrics - Loss: 0.3116, Accuracy: 0.8985
+2025-03-02 16:39:47,477 - INFO - Finished training for cluster 2/2
+2025-03-02 16:39:47,477 - INFO - 
+Training Summary:
+2025-03-02 16:39:47,478 - INFO - Total clusters: 2
+2025-03-02 16:39:47,478 - INFO - Rounds per cluster: 3
+2025-03-02 16:39:47,478 - INFO - Total cluster models: 2
+2025-03-02 16:39:48,910 - INFO - Starting final knowledge distillation process
+2025-03-02 16:39:51,037 - INFO - Teacher model 0 produced predictions successfully
+2025-03-02 16:39:53,144 - INFO - Teacher model 1 produced predictions successfully
+2025-03-02 16:39:53,144 - INFO - Teacher logits shape: torch.Size([18000, 10])
+2025-03-02 16:39:53,144 - INFO - Student model expects input shape matching: [torch.Size([18000, 1, 28, 28])]
+2025-03-02 16:39:55,560 - INFO - Epoch 1/10, Train Loss: 0.3545, Val Loss: 1.1407, Val Accuracy: 0.9142
+2025-03-02 16:39:58,014 - INFO - Epoch 2/10, Train Loss: 0.3431, Val Loss: 0.9240, Val Accuracy: 0.9409
+2025-03-02 16:40:00,345 - INFO - Epoch 3/10, Train Loss: 0.3416, Val Loss: 0.8549, Val Accuracy: 0.9527
+2025-03-02 16:40:02,680 - INFO - Epoch 4/10, Train Loss: 0.3410, Val Loss: 0.8796, Val Accuracy: 0.9588
+2025-03-02 16:40:04,959 - INFO - Epoch 5/10, Train Loss: 0.3404, Val Loss: 0.9584, Val Accuracy: 0.9539
+2025-03-02 16:40:07,316 - INFO - Epoch 6/10, Train Loss: 0.3403, Val Loss: 0.8568, Val Accuracy: 0.9547
+2025-03-02 16:40:09,645 - INFO - Epoch 7/10, Train Loss: 0.3401, Val Loss: 0.9281, Val Accuracy: 0.9557
+2025-03-02 16:40:12,006 - INFO - Epoch 8/10, Train Loss: 0.3400, Val Loss: 0.8281, Val Accuracy: 0.9563
+2025-03-02 16:40:14,315 - INFO - Epoch 9/10, Train Loss: 0.3398, Val Loss: 0.9155, Val Accuracy: 0.9527
+2025-03-02 16:40:16,615 - INFO - Epoch 10/10, Train Loss: 0.3397, Val Loss: 0.8564, Val Accuracy: 0.9538
+2025-03-02 16:40:17,721 - INFO - Final student model accuracy: 0.9563
+2025-03-02 16:40:17,721 - INFO - 
+Final Student Model Results:
+2025-03-02 16:40:17,721 - INFO - Accuracy: 0.9563
+2025-03-02 16:40:17,722 - INFO - Loss: 0.8281
+2025-03-02 16:40:17,722 - INFO - F1 Score: 0.9565
+2025-03-02 16:40:17,723 - INFO - Saved results to results\framework\fedprox_framework_alpha_0.5.json
+2025-03-02 16:40:17,725 - INFO - Saved results to results\framework\fedprox_framework_alpha_0.5.json
+2025-03-02 16:40:17,725 - INFO - Running framework: scaffold_framework_alpha_0.5
+2025-03-02 16:40:17,725 - INFO - Initializing framework with scaffold algorithm
+2025-03-02 16:40:24,696 - INFO - Created 2 clusters
+2025-03-02 16:40:24,696 - INFO - Cluster 0 has 3 clients
+2025-03-02 16:40:24,696 - INFO - Cluster 1 has 7 clients
+2025-03-02 16:40:24,697 - INFO - Starting training with 2 clusters
+2025-03-02 16:40:24,697 - INFO - Cluster 0 has 3 clients
+2025-03-02 16:40:24,697 - INFO - Cluster 1 has 7 clients
+2025-03-02 16:40:24,697 - INFO - Training cluster 1/2
+2025-03-02 16:40:24,697 - INFO - Cluster 1 has 3 clients
+2025-03-02 16:40:24,703 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:40:33,134 - INFO - Client 3 - Round 0 - Loss: 0.3585, Accuracy: 0.8943
+2025-03-02 16:40:38,711 - INFO - Client 7 - Round 0 - Loss: 0.5509, Accuracy: 0.8309
+2025-03-02 16:40:44,636 - INFO - Client 8 - Round 0 - Loss: 0.5422, Accuracy: 0.8349
+2025-03-02 16:40:46,441 - INFO - Round 0 - Global Model Accuracy: 0.7749
+2025-03-02 16:40:48,195 - INFO - Round 1 Metrics - Loss: 0.6106, Accuracy: 0.7749
+2025-03-02 16:40:48,196 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:40:56,774 - INFO - Client 3 - Round 1 - Loss: 0.1926, Accuracy: 0.9394
+2025-03-02 16:41:02,284 - INFO - Client 7 - Round 1 - Loss: 0.2905, Accuracy: 0.9106
+2025-03-02 16:41:08,283 - INFO - Client 8 - Round 1 - Loss: 0.2854, Accuracy: 0.9100
+2025-03-02 16:41:10,032 - INFO - Round 1 - Global Model Accuracy: 0.8803
+2025-03-02 16:41:11,846 - INFO - Round 2 Metrics - Loss: 0.3436, Accuracy: 0.8803
+2025-03-02 16:41:11,846 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:41:20,488 - INFO - Client 3 - Round 2 - Loss: 0.1506, Accuracy: 0.9539
+2025-03-02 16:41:26,052 - INFO - Client 7 - Round 2 - Loss: 0.2259, Accuracy: 0.9314
+2025-03-02 16:41:32,059 - INFO - Client 8 - Round 2 - Loss: 0.2261, Accuracy: 0.9300
+2025-03-02 16:41:33,789 - INFO - Round 2 - Global Model Accuracy: 0.8984
+2025-03-02 16:41:35,541 - INFO - Round 3 Metrics - Loss: 0.2845, Accuracy: 0.8984
+2025-03-02 16:41:35,541 - INFO - Finished training for cluster 1/2
+2025-03-02 16:41:35,541 - INFO - Training cluster 2/2
+2025-03-02 16:41:35,541 - INFO - Cluster 2 has 7 clients
+2025-03-02 16:41:35,546 - INFO - Starting round 1/3 for cluster 2
+2025-03-02 16:41:40,439 - INFO - Client 0 - Round 0 - Loss: 0.4127, Accuracy: 0.8892
+2025-03-02 16:41:47,564 - INFO - Client 1 - Round 0 - Loss: 0.5648, Accuracy: 0.8268
+2025-03-02 16:41:59,770 - INFO - Client 2 - Round 0 - Loss: 0.4716, Accuracy: 0.8538
+2025-03-02 16:42:07,900 - INFO - Client 4 - Round 0 - Loss: 0.4665, Accuracy: 0.8608
+2025-03-02 16:42:17,373 - INFO - Client 5 - Round 0 - Loss: 0.5792, Accuracy: 0.8181
+2025-03-02 16:42:23,343 - INFO - Client 6 - Round 0 - Loss: 0.7590, Accuracy: 0.7620
+2025-03-02 16:42:30,321 - INFO - Client 9 - Round 0 - Loss: 0.4499, Accuracy: 0.8706
+2025-03-02 16:42:32,037 - INFO - Round 0 - Global Model Accuracy: 0.8579
+2025-03-02 16:42:33,762 - INFO - Round 1 Metrics - Loss: 0.4606, Accuracy: 0.8579
+2025-03-02 16:42:33,762 - INFO - Starting round 2/3 for cluster 2
+2025-03-02 16:42:38,676 - INFO - Client 0 - Round 1 - Loss: 0.1662, Accuracy: 0.9521
+2025-03-02 16:42:45,813 - INFO - Client 1 - Round 1 - Loss: 0.2960, Accuracy: 0.9075
+2025-03-02 16:42:58,092 - INFO - Client 2 - Round 1 - Loss: 0.2904, Accuracy: 0.9107
+2025-03-02 16:43:06,154 - INFO - Client 4 - Round 1 - Loss: 0.2335, Accuracy: 0.9260
+2025-03-02 16:43:15,691 - INFO - Client 5 - Round 1 - Loss: 0.3536, Accuracy: 0.8907
+2025-03-02 16:43:21,672 - INFO - Client 6 - Round 1 - Loss: 0.4098, Accuracy: 0.8737
+2025-03-02 16:43:28,621 - INFO - Client 9 - Round 1 - Loss: 0.1783, Accuracy: 0.9483
+2025-03-02 16:43:30,361 - INFO - Round 1 - Global Model Accuracy: 0.9213
+2025-03-02 16:43:32,101 - INFO - Round 2 Metrics - Loss: 0.2604, Accuracy: 0.9213
+2025-03-02 16:43:32,101 - INFO - Starting round 3/3 for cluster 2
+2025-03-02 16:43:37,026 - INFO - Client 0 - Round 2 - Loss: 0.1156, Accuracy: 0.9661
+2025-03-02 16:43:44,126 - INFO - Client 1 - Round 2 - Loss: 0.2238, Accuracy: 0.9311
+2025-03-02 16:43:56,306 - INFO - Client 2 - Round 2 - Loss: 0.2288, Accuracy: 0.9321
+2025-03-02 16:44:04,397 - INFO - Client 4 - Round 2 - Loss: 0.1810, Accuracy: 0.9424
+2025-03-02 16:44:13,826 - INFO - Client 5 - Round 2 - Loss: 0.2673, Accuracy: 0.9181
+2025-03-02 16:44:19,727 - INFO - Client 6 - Round 2 - Loss: 0.3078, Accuracy: 0.9057
+2025-03-02 16:44:26,644 - INFO - Client 9 - Round 2 - Loss: 0.1323, Accuracy: 0.9618
+2025-03-02 16:44:28,382 - INFO - Round 2 - Global Model Accuracy: 0.9439
+2025-03-02 16:44:30,102 - INFO - Round 3 Metrics - Loss: 0.1840, Accuracy: 0.9439
+2025-03-02 16:44:30,102 - INFO - Finished training for cluster 2/2
+2025-03-02 16:44:30,102 - INFO - 
+Training Summary:
+2025-03-02 16:44:30,102 - INFO - Total clusters: 2
+2025-03-02 16:44:30,102 - INFO - Rounds per cluster: 3
+2025-03-02 16:44:30,102 - INFO - Total cluster models: 2
+2025-03-02 16:44:31,547 - INFO - Starting final knowledge distillation process
+2025-03-02 16:44:33,617 - INFO - Teacher model 0 produced predictions successfully
+2025-03-02 16:44:35,829 - INFO - Teacher model 1 produced predictions successfully
+2025-03-02 16:44:35,829 - INFO - Teacher logits shape: torch.Size([18000, 10])
+2025-03-02 16:44:35,829 - INFO - Student model expects input shape matching: [torch.Size([18000, 1, 28, 28])]
+2025-03-02 16:44:38,257 - INFO - Epoch 1/10, Train Loss: 0.3729, Val Loss: 1.0920, Val Accuracy: 0.9232
+2025-03-02 16:44:40,580 - INFO - Epoch 2/10, Train Loss: 0.3596, Val Loss: 0.9847, Val Accuracy: 0.9406
+2025-03-02 16:44:42,938 - INFO - Epoch 3/10, Train Loss: 0.3579, Val Loss: 0.8847, Val Accuracy: 0.9501
+2025-03-02 16:44:45,282 - INFO - Epoch 4/10, Train Loss: 0.3572, Val Loss: 0.8264, Val Accuracy: 0.9544
+2025-03-02 16:44:47,623 - INFO - Epoch 5/10, Train Loss: 0.3568, Val Loss: 0.8308, Val Accuracy: 0.9578
+2025-03-02 16:44:49,979 - INFO - Epoch 6/10, Train Loss: 0.3564, Val Loss: 0.8289, Val Accuracy: 0.9516
+2025-03-02 16:44:52,319 - INFO - Epoch 7/10, Train Loss: 0.3563, Val Loss: 0.8689, Val Accuracy: 0.9615
+2025-03-02 16:44:54,621 - INFO - Epoch 8/10, Train Loss: 0.3563, Val Loss: 0.8226, Val Accuracy: 0.9625
+2025-03-02 16:44:56,952 - INFO - Epoch 9/10, Train Loss: 0.3560, Val Loss: 0.8712, Val Accuracy: 0.9549
+2025-03-02 16:44:59,253 - INFO - Epoch 10/10, Train Loss: 0.3559, Val Loss: 0.9944, Val Accuracy: 0.9559
+2025-03-02 16:45:00,352 - INFO - Final student model accuracy: 0.9625
+2025-03-02 16:45:00,352 - INFO - 
+Final Student Model Results:
+2025-03-02 16:45:00,352 - INFO - Accuracy: 0.9625
+2025-03-02 16:45:00,353 - INFO - Loss: 0.8226
+2025-03-02 16:45:00,353 - INFO - F1 Score: 0.9625
+2025-03-02 16:45:00,354 - INFO - Saved results to results\framework\scaffold_framework_alpha_0.5.json
+2025-03-02 16:45:00,358 - INFO - Saved results to results\framework\scaffold_framework_alpha_0.5.json
+2025-03-02 16:45:00,358 - INFO - Running framework: fednova_framework_alpha_0.5
+2025-03-02 16:45:00,358 - INFO - Initializing framework with fednova algorithm
+2025-03-02 16:45:07,304 - INFO - Created 2 clusters
+2025-03-02 16:45:07,305 - INFO - Cluster 0 has 5 clients
+2025-03-02 16:45:07,305 - INFO - Cluster 1 has 5 clients
+2025-03-02 16:45:07,305 - INFO - Starting training with 2 clusters
+2025-03-02 16:45:07,305 - INFO - Cluster 0 has 5 clients
+2025-03-02 16:45:07,305 - INFO - Cluster 1 has 5 clients
+2025-03-02 16:45:07,305 - INFO - Training cluster 1/2
+2025-03-02 16:45:07,305 - INFO - Cluster 1 has 5 clients
+2025-03-02 16:45:07,310 - INFO - Starting round 1/3 for cluster 1
+2025-03-02 16:45:16,556 - INFO - Client 1 - Round 0 - Loss: 0.3943, Accuracy: 0.8790, Norm Factor: 5.3705
+2025-03-02 16:45:26,813 - INFO - Client 3 - Round 0 - Loss: 0.4242, Accuracy: 0.8723, Norm Factor: 5.7787
+2025-03-02 16:45:33,949 - INFO - Client 4 - Round 0 - Loss: 0.5598, Accuracy: 0.8257, Norm Factor: 5.9604
+2025-03-02 16:45:39,114 - INFO - Client 6 - Round 0 - Loss: 0.4429, Accuracy: 0.8745, Norm Factor: 5.0125
+2025-03-02 16:45:47,869 - INFO - Client 9 - Round 0 - Loss: 0.4382, Accuracy: 0.8684, Norm Factor: 5.5826
+2025-03-02 16:45:49,584 - INFO - Round 0 - Global Model Accuracy: 0.8812
+2025-03-02 16:45:51,335 - INFO - Round 1 Metrics - Loss: 0.4172, Accuracy: 0.8812
+2025-03-02 16:45:51,336 - INFO - Starting round 2/3 for cluster 1
+2025-03-02 16:46:00,564 - INFO - Client 1 - Round 1 - Loss: 0.2041, Accuracy: 0.9382, Norm Factor: 5.1215
+2025-03-02 16:46:11,000 - INFO - Client 3 - Round 1 - Loss: 0.2374, Accuracy: 0.9265, Norm Factor: 5.4634
+2025-03-02 16:46:18,079 - INFO - Client 4 - Round 1 - Loss: 0.3147, Accuracy: 0.8985, Norm Factor: 6.0668
+2025-03-02 16:46:23,209 - INFO - Client 6 - Round 1 - Loss: 0.1820, Accuracy: 0.9460, Norm Factor: 4.6422
+2025-03-02 16:46:31,910 - INFO - Client 9 - Round 1 - Loss: 0.2393, Accuracy: 0.9276, Norm Factor: 5.3346
+2025-03-02 16:46:33,640 - INFO - Round 1 - Global Model Accuracy: 0.9237
+2025-03-02 16:46:35,361 - INFO - Round 2 Metrics - Loss: 0.2597, Accuracy: 0.9237
+2025-03-02 16:46:35,362 - INFO - Starting round 3/3 for cluster 1
+2025-03-02 16:46:44,545 - INFO - Client 1 - Round 2 - Loss: 0.1537, Accuracy: 0.9533, Norm Factor: 4.3894
+2025-03-02 16:46:54,910 - INFO - Client 3 - Round 2 - Loss: 0.1812, Accuracy: 0.9435, Norm Factor: 4.7923
+2025-03-02 16:47:01,970 - INFO - Client 4 - Round 2 - Loss: 0.2397, Accuracy: 0.9238, Norm Factor: 5.4018
+2025-03-02 16:47:07,114 - INFO - Client 6 - Round 2 - Loss: 0.1378, Accuracy: 0.9581, Norm Factor: 4.0281
+2025-03-02 16:47:15,793 - INFO - Client 9 - Round 2 - Loss: 0.1851, Accuracy: 0.9437, Norm Factor: 4.6675
+2025-03-02 16:47:17,529 - INFO - Round 2 - Global Model Accuracy: 0.9417
+2025-03-02 16:47:19,302 - INFO - Round 3 Metrics - Loss: 0.1952, Accuracy: 0.9417
+2025-03-02 16:47:19,302 - INFO - Finished training for cluster 1/2
+2025-03-02 16:47:19,302 - INFO - Training cluster 2/2
+2025-03-02 16:47:19,302 - INFO - Cluster 2 has 5 clients
+2025-03-02 16:47:19,305 - INFO - Starting round 1/3 for cluster 2
+2025-03-02 16:47:26,501 - INFO - Client 0 - Round 0 - Loss: 0.4650, Accuracy: 0.8575, Norm Factor: 4.7141
+2025-03-02 16:47:34,258 - INFO - Client 2 - Round 0 - Loss: 0.4443, Accuracy: 0.8648, Norm Factor: 4.8984
+2025-03-02 16:47:39,629 - INFO - Client 5 - Round 0 - Loss: 0.5973, Accuracy: 0.8090, Norm Factor: 5.4057
+2025-03-02 16:47:44,464 - INFO - Client 7 - Round 0 - Loss: 0.6825, Accuracy: 0.7913, Norm Factor: 5.5637
+2025-03-02 16:47:50,013 - INFO - Client 8 - Round 0 - Loss: 0.5296, Accuracy: 0.8399, Norm Factor: 5.1365
+2025-03-02 16:47:51,735 - INFO - Round 0 - Global Model Accuracy: 0.7310
+2025-03-02 16:47:53,450 - INFO - Round 1 Metrics - Loss: 0.7797, Accuracy: 0.7310
+2025-03-02 16:47:53,450 - INFO - Starting round 2/3 for cluster 2
+2025-03-02 16:48:00,569 - INFO - Client 0 - Round 1 - Loss: 0.2520, Accuracy: 0.9229, Norm Factor: 5.2499
+2025-03-02 16:48:08,203 - INFO - Client 2 - Round 1 - Loss: 0.2029, Accuracy: 0.9379, Norm Factor: 4.8820
+2025-03-02 16:48:13,548 - INFO - Client 5 - Round 1 - Loss: 0.2676, Accuracy: 0.9151, Norm Factor: 5.8046
+2025-03-02 16:48:18,397 - INFO - Client 7 - Round 1 - Loss: 0.3350, Accuracy: 0.8969, Norm Factor: 6.3809
+2025-03-02 16:48:23,896 - INFO - Client 8 - Round 1 - Loss: 0.2470, Accuracy: 0.9248, Norm Factor: 5.4460
+2025-03-02 16:48:25,608 - INFO - Round 1 - Global Model Accuracy: 0.8734
+2025-03-02 16:48:27,316 - INFO - Round 2 Metrics - Loss: 0.4003, Accuracy: 0.8734
+2025-03-02 16:48:27,316 - INFO - Starting round 3/3 for cluster 2
+2025-03-02 16:48:34,413 - INFO - Client 0 - Round 2 - Loss: 0.1915, Accuracy: 0.9401, Norm Factor: 4.7657
+2025-03-02 16:48:42,044 - INFO - Client 2 - Round 2 - Loss: 0.1492, Accuracy: 0.9525, Norm Factor: 4.3073
+2025-03-02 16:48:47,392 - INFO - Client 5 - Round 2 - Loss: 0.1937, Accuracy: 0.9361, Norm Factor: 5.1392
+2025-03-02 16:48:52,191 - INFO - Client 7 - Round 2 - Loss: 0.2508, Accuracy: 0.9234, Norm Factor: 5.7370
+2025-03-02 16:48:57,751 - INFO - Client 8 - Round 2 - Loss: 0.1810, Accuracy: 0.9461, Norm Factor: 4.7247
+2025-03-02 16:48:59,494 - INFO - Round 2 - Global Model Accuracy: 0.9063
+2025-03-02 16:49:01,231 - INFO - Round 3 Metrics - Loss: 0.3056, Accuracy: 0.9063
+2025-03-02 16:49:01,231 - INFO - Finished training for cluster 2/2
+2025-03-02 16:49:01,232 - INFO - 
+Training Summary:
+2025-03-02 16:49:01,232 - INFO - Total clusters: 2
+2025-03-02 16:49:01,232 - INFO - Rounds per cluster: 3
+2025-03-02 16:49:01,232 - INFO - Total cluster models: 2
+2025-03-02 16:49:02,674 - INFO - Starting final knowledge distillation process
+2025-03-02 16:49:04,809 - INFO - Teacher model 0 produced predictions successfully
+2025-03-02 16:49:06,911 - INFO - Teacher model 1 produced predictions successfully
+2025-03-02 16:49:06,912 - INFO - Teacher logits shape: torch.Size([18000, 10])
+2025-03-02 16:49:06,912 - INFO - Student model expects input shape matching: [torch.Size([18000, 1, 28, 28])]
+2025-03-02 16:49:09,287 - INFO - Epoch 1/10, Train Loss: 0.3552, Val Loss: 1.1145, Val Accuracy: 0.8984
+2025-03-02 16:49:11,601 - INFO - Epoch 2/10, Train Loss: 0.3426, Val Loss: 0.9271, Val Accuracy: 0.9498
+2025-03-02 16:49:13,901 - INFO - Epoch 3/10, Train Loss: 0.3412, Val Loss: 0.9114, Val Accuracy: 0.9573
+2025-03-02 16:49:16,243 - INFO - Epoch 4/10, Train Loss: 0.3404, Val Loss: 0.7935, Val Accuracy: 0.9431
+2025-03-02 16:49:18,560 - INFO - Epoch 5/10, Train Loss: 0.3403, Val Loss: 0.9270, Val Accuracy: 0.9494
+2025-03-02 16:49:20,874 - INFO - Epoch 6/10, Train Loss: 0.3399, Val Loss: 0.8254, Val Accuracy: 0.9621
+2025-03-02 16:49:23,211 - INFO - Epoch 7/10, Train Loss: 0.3397, Val Loss: 0.8129, Val Accuracy: 0.9600
+2025-03-02 16:49:25,531 - INFO - Epoch 8/10, Train Loss: 0.3396, Val Loss: 0.8012, Val Accuracy: 0.9613
+2025-03-02 16:49:27,800 - INFO - Epoch 9/10, Train Loss: 0.3395, Val Loss: 0.8678, Val Accuracy: 0.9618
+2025-03-02 16:49:30,093 - INFO - Epoch 10/10, Train Loss: 0.3393, Val Loss: 0.7912, Val Accuracy: 0.9614
+2025-03-02 16:49:31,184 - INFO - Final student model accuracy: 0.9614
+2025-03-02 16:49:31,184 - INFO - 
+Final Student Model Results:
+2025-03-02 16:49:31,185 - INFO - Accuracy: 0.9614
+2025-03-02 16:49:31,185 - INFO - Loss: 0.7912
+2025-03-02 16:49:31,185 - INFO - F1 Score: 0.9613
+2025-03-02 16:49:31,186 - INFO - Saved results to results\framework\fednova_framework_alpha_0.5.json
+2025-03-02 16:49:31,188 - INFO - Saved results to results\framework\fednova_framework_alpha_0.5.json
+2025-03-02 16:49:31,188 - INFO - 
+Overall Progress: [2/8] (25.0%)
+
+2025-03-02 16:49:31,195 - INFO - Saved results to results\summary\experiment_summary.json
+2025-03-02 16:49:31,195 - INFO - 
+======================================================================
+2025-03-02 16:49:31,195 - INFO - Experiment Summary:
+2025-03-02 16:49:31,196 - INFO - ======================================================================
+2025-03-02 16:49:31,196 - INFO - {
+  "baseline_summary": {
+    "fedavg": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9441,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 1
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9426,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 1
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9145,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 1
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9415,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 1
+      }
+    }
+  },
+  "framework_summary": {
+    "fedavg": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9558,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 2
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9563,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 2
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9625,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 2
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "final_accuracy": 0.9614,
+        "rounds_to_target": null,
+        "privacy_budget": null,
+        "num_clusters": 2
+      }
+    }
+  },
+  "improvements": {
+    "fedavg": {
+      "alpha_0.5": {
+        "accuracy_improvement_percentage": 1.2392755004766371,
+        "base_accuracy": 0.9441,
+        "framework_accuracy": 0.9558
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "accuracy_improvement_percentage": 1.4534266921281611,
+        "base_accuracy": 0.9426,
+        "framework_accuracy": 0.9563
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "accuracy_improvement_percentage": 5.248769819573542,
+        "base_accuracy": 0.9145,
+        "framework_accuracy": 0.9625
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "accuracy_improvement_percentage": 2.1136484333510386,
+        "base_accuracy": 0.9415,
+        "framework_accuracy": 0.9614
+      }
+    }
+  },
+  "experiment_metadata": {
+    "total_experiments": 8,
+    "dataset": "mnist",
+    "num_clients": 10,
+    "num_rounds": 3
+  },
+  "time_to_accuracy": {
+    "fedavg": {
+      "alpha_0.5": {
+        "baseline": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        },
+        "framework": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        }
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "baseline": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        },
+        "framework": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        }
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "baseline": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        },
+        "framework": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        }
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "baseline": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        },
+        "framework": {
+          "rounds_to_0.6": 1,
+          "rounds_to_0.7": 1,
+          "rounds_to_0.8": 1
+        }
+      }
+    }
+  },
+  "communication_efficiency": {
+    "fedavg": {
+      "alpha_0.5": {
+        "baseline_efficiency": 989960.6016,
+        "framework_efficiency": 1002228.9408,
+        "efficiency_improvement": 12268.33919999993
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "baseline_efficiency": 988387.7376,
+        "framework_efficiency": 1002753.2288,
+        "efficiency_improvement": 14365.491200000048
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "baseline_efficiency": 958922.752,
+        "framework_efficiency": 1009254.4,
+        "efficiency_improvement": 50331.648000000045
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "baseline_efficiency": 987234.304,
+        "framework_efficiency": 1008100.9664,
+        "efficiency_improvement": 20866.66240000003
+      }
+    }
+  },
+  "statistical_significance": {
+    "fedavg": {
+      "alpha_0.5": {
+        "t_statistic": 0.3421073656395652,
+        "p_value": 0.749512954129564,
+        "statistically_significant": false
+      }
+    },
+    "fedprox": {
+      "alpha_0.5": {
+        "t_statistic": 1.0746279624257717,
+        "p_value": 0.3776419253651539,
+        "statistically_significant": false
+      }
+    },
+    "scaffold": {
+      "alpha_0.5": {
+        "t_statistic": 2.102050097633096,
+        "p_value": 0.1389932335817369,
+        "statistically_significant": false
+      }
+    },
+    "fednova": {
+      "alpha_0.5": {
+        "t_statistic": 0.7335433197268972,
+        "p_value": 0.5039299447505442,
+        "statistically_significant": false
+      }
+    }
+  }
+}

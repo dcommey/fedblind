@@ -665,6 +665,22 @@ class ExperimentRunner:
                     if not base_acc_history or not framework_acc_history:
                         continue
                     
+                    # If we only have one data point, use final accuracies
+                    if len(base_acc_history) == 1 and len(framework_acc_history) == 1:
+                        base_acc = base_acc_history[0]
+                        framework_acc = framework_acc_history[0]
+                        
+                        # We can't compute t-test with single points, but can record improvement
+                        improvement = framework_acc - base_acc
+                        significance_results[baseline][alpha_key] = {
+                            "t_statistic": None,
+                            "p_value": None,
+                            "statistically_significant": None,
+                            "absolute_improvement": improvement,
+                            "relative_improvement": (improvement / base_acc * 100) if base_acc > 0 else 0
+                        }
+                        continue
+                    
                     # Match the lengths if different
                     min_len = min(len(base_acc_history), len(framework_acc_history))
                     base_acc = base_acc_history[:min_len]

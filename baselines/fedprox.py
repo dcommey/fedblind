@@ -4,6 +4,7 @@ import torch
 from federated.base_server import BaseServer
 from federated.base_client import BaseClient
 from torch import nn, optim
+import torch.nn.functional as F  # Added missing import
 import copy
 import logging
 
@@ -75,6 +76,7 @@ class FedProxServer(BaseServer):
         super().__init__(config)
         self.global_model = config.model_class()  # Initialize the global model
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def train_round(self, round_number):
         """Execute one round of federated learning with FedProx."""
@@ -112,15 +114,41 @@ class FedProxServer(BaseServer):
         """Aggregate by averaging (FedProx still uses FedAvg for aggregation)."""
         return super().aggregate_models(models)
 
-    def evaluate_global_model(self, test_data=None, test_labels=None):
-        """Evaluate the global model on the test dataset.
+    def evaluate_global_model(self):
+        """Evaluate the global model on the test dataset."""
+        self.global_model.eval()
+        test_loss = 0
+        correct = 0
+        total = 0
         
-        If test_data and test_labels are not provided, uses the server's test_loader instead.
-        """
-        if test_data is None and self.test_loader is not None:
-            return self.evaluate_model(self.global_model, self.test_loader)
-        elif test_data is not None:
-            return self.evaluate_model(self.global_model, test_data, test_labels)
-        else:
-            self.logger.warning("No test data available for evaluation")
-            return None
+        all_predictions = []
+        all_labels = []
+        
+        with torch.no_grad():
+            for data, target in self.test_loader:
+                data, target = data.to(self.device), target.to(self.device)
+                output = self.global_model(data)
+                test_loss += F.cross_entropy(output, target).item()
+                pred = output.argmax(1, keepdim=True)
+                correct += pred.eq(target.view_as(pred)).sum().item()
+                total += target.size(0)
+                
+                # Store predictions and labels for F1 score calculation
+                all_predictions.extend(pred.cpu().numpy())
+                all_labels.extend(target.cpu().numpy())
+        
+        test_loss /= len(self.test_loader.dataset)
+        accuracy = correct / total
+        
+        # Calculate F1 score with zero_division=0 to avoid warnings
+        from sklearn.metrics import f1_score
+        f1 = f1_score(all_labels, all_predictions, average='weighted', zero_division=0)
+        
+        self.logger.info(f'Test set: Average loss: {test_loss:.4f}, '
+                        f'Accuracy: {accuracy:.4f}, F1 Score: {f1:.4f}')
+        
+        return {
+            'loss': test_loss,
+            'accuracy': accuracy,
+            'f1_score': f1
+        }

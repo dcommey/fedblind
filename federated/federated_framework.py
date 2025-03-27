@@ -352,7 +352,7 @@ class FederatedLearningFramework:
             weight_decay=1e-4
         )
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode='min', factor=0.5, patience=5, verbose=True
+            optimizer, mode='min', factor=0.5, patience=5, verbose=False  # Changed to False
         )
 
         # Training loop setup
@@ -591,11 +591,12 @@ class FederatedLearningFramework:
         return accuracy, avg_loss, all_predictions, all_labels
 
     def _compute_metrics(self, predictions, true_labels):
+        """Calculate metrics with proper handling of zero division."""
         return {
             'accuracy': accuracy_score(true_labels, predictions),
-            'precision': precision_score(true_labels, predictions, average='weighted'),
-            'recall': recall_score(true_labels, predictions, average='weighted'),
-            'f1_score': f1_score(true_labels, predictions, average='weighted')
+            'precision': precision_score(true_labels, predictions, average='weighted', zero_division=0),
+            'recall': recall_score(true_labels, predictions, average='weighted', zero_division=0),
+            'f1_score': f1_score(true_labels, predictions, average='weighted', zero_division=0)
         }
 
     def _print_sample_predictions(self, model, dataloader):

@@ -2,6 +2,8 @@
 datasets/
 results/
 saved_models/
+lcn_results/
+experiment_results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
