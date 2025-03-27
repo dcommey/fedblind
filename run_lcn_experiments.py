@@ -488,12 +488,12 @@ def run_all_experiments():
     
     # Define experiment configurations
     experiments = [
-        # {"dataset": "cifar10", "num_rounds": 150, "alpha": 0.5},
-        # {"dataset": "cifar10", "num_rounds": 150, "alpha": 1.0},
-        # {"dataset": "cifar10", "num_rounds": 150, "alpha": 3.0},
-        {"dataset": "mnist", "num_rounds": 1, "alpha": 0.5},
-        {"dataset": "mnist", "num_rounds": 1, "alpha": 1.0},
-        {"dataset": "mnist", "num_rounds": 1, "alpha": 3.0}
+        {"dataset": "cifar10", "num_rounds": 150, "alpha": 0.5},
+        {"dataset": "cifar10", "num_rounds": 150, "alpha": 1.0},
+        {"dataset": "cifar10", "num_rounds": 150, "alpha": 3.0},
+        {"dataset": "mnist", "num_rounds": 50, "alpha": 0.5},
+        {"dataset": "mnist", "num_rounds": 50, "alpha": 1.0},
+        {"dataset": "mnist", "num_rounds": 50, "alpha": 3.0}
     ]
     
     # Parse command line arguments for custom configuration
