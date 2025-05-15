@@ -1,19 +1,21 @@
-# FedSiKD: Federated Learning with Secure Clustering and Knowledge Distillation
+# FedBlind: Federated Learning with Secure Clustering and Knowledge Distillation
 
-FedSiKD is a framework that combines Federated Learning with secure (differentially private) client clustering and knowledge distillation to address data heterogeneity and client drift in federated learning systems while maintaining privacy guarantees.
+## Overview
+
+FedBlind is a novel framework that integrates Federated Learning (FL), differentially private (DP) client clustering, and knowledge distillation to address data heterogeneity and client drift in federated systems while maintaining rigorous privacy guarantees.
 
 ## Key Features
 
-- **Privacy-Preserving Client Clustering**: Uses differential privacy to securely group similar clients
-- **Federated Learning**: Implements multiple FL algorithms (FedAvg, FedProx, Scaffold, FedNova)
-- **Knowledge Distillation**: Transfers knowledge from multiple teacher models to a single student model
-- **Quantile-Based Clustering**: Efficient clustering mechanism with privacy guarantees
-- **Comprehensive Evaluation**: Includes metrics for accuracy, privacy, and convergence
+- **Privacy-Preserving Client Clustering**: Implements DP quantile-based clustering to securely group clients based on feature or label similarity.
+- **Federated Learning Algorithms**: Supports multiple FL optimization strategies, including FedAvg, FedProx, SCAFFOLD, and FedNova.
+- **Knowledge Distillation**: Applies multi-teacher to single-student distillation to aggregate knowledge across clusters.
+- **Quantile-Based Clustering**: Efficient and privacy-aware method for clustering non-IID clients.
+- **Evaluation Suite**: Benchmarks include accuracy, convergence speed, and privacy utility trade-offs.
 
 ## Project Structure
 
 ```
-FedSiKD/
+FedBlind/
 ├── baselines/
 │   ├── fedavg.py
 │   ├── fedprox.py
@@ -35,32 +37,31 @@ FedSiKD/
 │   ├── mnist_models.py
 │   ├── cifar_models.py
 │   └── har_models.py
-└── utils/
-    └── config.py
+├── utils/
+├── config.py
+└── run_experiments.py
 ```
 
 ## Usage
 
-Run experiments with different configurations:
-
 ```bash
-# Basic usage
-python run_experiments.py --dataset cifar10 --num_clients 10 --num_rounds 50
+# Basic experiment
+python run_experiments.py --dataset har --num_clients 10 --num_rounds 50
 
-# With clustering and privacy
-python run_experiments.py --dataset cifar10 --num_clients 10 --num_rounds 50 \
+# With DP clustering
+python run_experiments.py --dataset har --num_clients 10 --num_rounds 50 \
     --num_clusters 2 --cl_epsilon 1.0 --alpha 0.5 --use_dp_clustering
 ```
 
 ### Command Line Arguments
 
-- `--dataset`: Choose dataset (mnist, cifar10, cifar100, svhn, har)
-- `--num_clients`: Number of federated clients
+- `--dataset`: Dataset to use (`mnist`, `cifar10`, `cifar100`, `svhn`, `har`)
+- `--num_clients`: Number of clients
 - `--num_rounds`: Number of communication rounds
-- `--num_clusters`: Number of client clusters
-- `--cl_epsilon`: Privacy budget for DP clustering
-- `--alpha`: Dirichlet parameter for non-IID data distribution
-- `--use_dp_clustering`: Enable differential privacy in clustering
+- `--num_clusters`: Number of clusters for client grouping
+- `--cl_epsilon`: DP budget for clustering
+- `--alpha`: Dirichlet parameter for data heterogeneity
+- `--use_dp_clustering`: Enables differentially private clustering
 
 ## Supported Datasets
 
@@ -70,45 +71,47 @@ python run_experiments.py --dataset cifar10 --num_clients 10 --num_rounds 50 \
 - SVHN
 - HAR (Human Activity Recognition)
 
-## Key Components
+## Methodology Summary
 
-1. **Secure Clustering**
-   - Differentially private quantile-based clustering
-   - Feature-based and label-based clustering options
-   - Privacy budget management
+### Secure Clustering
 
-2. **Federated Learning**
-   - Multiple federated optimization algorithms
-   - Support for non-IID data distributions
-   - Client-server architecture
+- Differentially private, quantile-based mechanism
+- Label-based or feature-based grouping
+- Controlled via privacy budget `epsilon`
 
-3. **Knowledge Distillation**
-   - Multi-teacher knowledge distillation
-   - Student model optimization
-   - Temperature scaling
+### Federated Learning
+
+- Modular optimization algorithms: FedAvg, FedProx, SCAFFOLD, FedNova
+- Handles non-IID client data via Dirichlet-sampled partitions
+
+### Knowledge Distillation
+
+- Multi-teacher ensemble from each cluster
+- Temperature-scaled soft target transfer to a student model
+- Improves generalization without direct data sharing
 
 ## Results
 
-The framework achieves:
-- Improved model performance in heterogeneous settings
-- Privacy guarantees through differential privacy
-- Reduced communication overhead
-- Better convergence compared to baseline methods
+FedBlind demonstrates:
+
+- Improved convergence and final accuracy in heterogeneous FL settings
+- Strong privacy guarantees using DP clustering
+- Reduction in communication cost
+- Better performance than non-clustered and non-distilled baselines
 
 ## Citation
 
-If you use this code for your research, please cite our paper:
+This repository accompanies a submission under double-blind review. To refer to this work:
 
 ```bibtex
-@article{fedsikd2025,
-  title={FedSiKD: Federated Learning with Secure Clustering and Knowledge Distillation},
-  author={},
-  journal={ArXiv},
-  year={2024}
+@unpublished{anonymous2025fedblind,
+  title={{FedBlind}: Federated Learning with Secure Clustering and Knowledge Distillation},
+  author={Anonymous Authors},
+  note={Under review at NeurIPS 2025},
+  year={2025}
 }
 ```
 
 ## License
 
-This project is licensed under the MIT License.
-
+This project is released under the MIT License.
